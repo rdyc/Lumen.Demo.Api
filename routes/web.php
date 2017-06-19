@@ -29,4 +29,20 @@ $app->group(['middleware' => 'auth', 'prefix' => 'v1', 'namespace' => 'Api\V1'],
         $app->patch('/{id}', 'Master\ArtistController@patch');
         $app->delete('/{id}', 'Master\ArtistController@delete');
     });
+
+    $app->group(['prefix' => 'album'], function () use ($app) {
+        $app->get('/', 'Master\AlbumController@get');
+        $app->get('/{id}', 'Master\AlbumController@getId');
+        $app->post('/', 'Master\AlbumController@post');
+        $app->patch('/{id}', 'Master\AlbumController@patch');
+        $app->delete('/{id}', 'Master\AlbumController@delete');
+    });
+
+    $app->group(['prefix' => 'track'], function () use ($app) {
+        $app->get('/', 'Master\TrackController@get');
+        $app->get('/{id}', 'Master\TrackController@getId');
+        $app->post('/', 'Master\TrackController@post');
+        $app->patch('/{id}', 'Master\TrackController@patch');
+        $app->delete('/{id}', 'Master\TrackController@delete');
+    });
 });

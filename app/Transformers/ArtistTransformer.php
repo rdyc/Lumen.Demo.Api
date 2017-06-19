@@ -46,11 +46,7 @@ class ArtistTransformer extends TransformerAbstract
      */
     public function transform(Artist $artist)
     {
-        return [
-            'id' => $artist->id,
-            'name' => $artist->name,
-            'active' => $artist->active
-        ];
+        return $artist->toArray();
     }
 
     /**

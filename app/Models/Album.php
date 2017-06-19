@@ -32,7 +32,7 @@ class Album extends BaseModel
      */
     public function artist()
     {
-        return $this->hasOne(Artist::class. 'artist_id');
+        return $this->hasOne(Artist::class, 'id', 'artist_id');
     }
 
     /**

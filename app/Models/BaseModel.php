@@ -5,7 +5,7 @@ namespace App\Models;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
-class BaseModel extends Model 
+abstract class BaseModel extends Model
 {
 
     /**
@@ -13,7 +13,7 @@ class BaseModel extends Model
      *
      * @var bool
      */
-    public $timestamps = false;
+    public $timestamps = true;
 
     /**
      * The attributes that should be mutated to dates.
@@ -25,6 +25,11 @@ class BaseModel extends Model
         'updated_at',
         'deleted_at'
     ];
+
+    /** Default sort direction
+     *  @var string
+     */
+    protected $defaultSort = 'asc';
 
     /**
      * The storage format of the model's date columns.
@@ -49,18 +54,55 @@ class BaseModel extends Model
      * @var array
      */
     protected $hidden = [
-        //'active'
+        'deleted_at'
     ];
 
-    public function getCreatedAtAttribute($attr) {
-        return Carbon::parse($attr)->format('c');
+    public function getSortDirection()
+    {
+        return $this->defaultSort;
     }
 
-    public function getUpdatedAtAttribute($attr) {
-        return Carbon::parse($attr)->format('c');
+    public function getCreatedAtAttribute($attr)
+    {
+        return $this->formatDate($attr);
     }
 
-    public function getDeletedAtAttribute($attr) {
-        return Carbon::parse($attr)->format('c');
+    public function getUpdatedAtAttribute($attr)
+    {
+        return $this->formatDate($attr);
+    }
+
+    public function getDeletedAtAttribute($attr)
+    {
+        return $this->formatDate($attr);
+    }
+
+    public function onCreated()
+    {
+        return [
+            'id' => $this->id,
+            'created_at' => $this->formatDate($this->attributes['created_at'])
+        ];
+    }
+
+    public function onUpdated()
+    {
+        return [
+            'id' => $this->id,
+            'updated_at' => $this->formatDate($this->attributes['updated_at']),
+        ];
+    }
+
+    public function onDeleted()
+    {
+        return [
+            'id' => $this->id,
+            'deleted_at' => $this->formatDate($this->attributes['deleted_at']),
+        ];
+    }
+
+    private function formatDate($attr)
+    {
+        return $attr ? Carbon::parse($attr)->format('c') : null;
     }
 }

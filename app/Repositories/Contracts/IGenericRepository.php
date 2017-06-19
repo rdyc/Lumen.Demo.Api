@@ -2,9 +2,9 @@
 
 namespace App\Repositories\Contracts;
 
-interface BaseContract
+interface IGenericRepository
 {
-    public function getAll($page, $limit);
+    public function get($page, $limit, $sort, $order);
     public function find($id);
     public function create($model);
     public function update($id, $model);

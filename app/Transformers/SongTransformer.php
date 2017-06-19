@@ -25,14 +25,6 @@ class SongTransformer extends TransformerAbstract
      */
     public function transform(Song $song)
     {
-        /*$result =  new \stdClass();
-        $result->id = (int) $album->id;
-        $result->title = $album->title;
-        $result->released = $album->released;
-        $result->active = (bool) $album->active;
-
-        return get_object_vars($result);*/
-
         return $song->toArray();
     }
 
@@ -49,7 +41,7 @@ class SongTransformer extends TransformerAbstract
             return null;
         }
 
-        return $this->item($artist, App::make(ArtistTransformer::class));
+        return $this->collection($artist, App::make(ArtistTransformer::class));
     }
 
     /**

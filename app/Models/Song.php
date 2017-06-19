@@ -28,6 +28,14 @@ class Song extends BaseModel
     ];
 
     /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function artist()
+    {
+        return $this->hasManyThrough('App\Models\Artist', 'App\Models\Album', 'artist_id', 'id');
+    }
+
+    /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function albums()

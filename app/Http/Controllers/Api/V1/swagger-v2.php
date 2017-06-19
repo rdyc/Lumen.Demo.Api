@@ -59,6 +59,16 @@
  *     default=10
  * )
  * 
+ * @SWG\Parameter(
+ *     parameter="Sorting",
+ *     in="query",
+ *     name="sort",
+ *     type="string",
+ *     description="Sort direction",
+ *     required=false,
+ *     enum={"asc", "desc"}
+ * ),
+ *
  * @SWG\Definition(
  *     definition="created",
  *     @SWG\Property(

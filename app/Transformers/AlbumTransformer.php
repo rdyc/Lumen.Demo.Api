@@ -25,14 +25,6 @@ class AlbumTransformer extends TransformerAbstract
      */
     public function transform(Album $album)
     {
-        /*$result =  new \stdClass();
-        $result->id = (int) $album->id;
-        $result->title = $album->title;
-        $result->released = $album->released;
-        $result->active = (bool) $album->active;
-
-        return get_object_vars($result);*/
-
         return $album->toArray();
     }
 

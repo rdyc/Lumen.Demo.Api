@@ -18,5 +18,7 @@ class AppServiceProvider extends ServiceProvider
 
     private function register_repositories(){
         $this->app->bind('App\Repositories\Contracts\IArtistRepository', 'App\Repositories\ArtistRepository', true);
+        $this->app->bind('App\Repositories\Contracts\IAlbumRepository', 'App\Repositories\AlbumRepository', true);
+        $this->app->bind('App\Repositories\Contracts\ISongRepository', 'App\Repositories\SongRepository', true);
     }
 }

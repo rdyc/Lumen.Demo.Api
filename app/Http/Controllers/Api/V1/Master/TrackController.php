@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Api\V1\Master;
 
 use App\Http\Controllers\Controller;
-use App\Repositories\Contracts\IArtistRepository;
-use App\Transformers\ArtistTransformer;
+use App\Repositories\Contracts\ISongRepository;
+use App\Transformers\SongTransformer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Validation\ValidationException;
@@ -13,27 +13,27 @@ use League\Fractal\Pagination\Cursor;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
-class ArtistController extends Controller
+class TrackController extends Controller
 {
     /**
-    * @var \App\Repositories\Contracts\IArtistRepository
+    * @var \App\Repositories\Contracts\ISongRepository
     */
     private $repo;
 
-    public function __construct(IArtistRepository $repo)
+    public function __construct(ISongRepository $repo)
     {
         $this->repo = $repo;
     }
 
     /**
-     * @SWG\Get(path="/artist",
+     * @SWG\Get(path="/track",
      *   security={
      *     {"demo_auth": {}}
      *   },
-     *   tags={"Artist"},
-     *   summary="Get all artists",
+     *   tags={"Track"},
+     *   summary="Get all Tracks",
      *   description="",
-     *   operationId="getAllArtists",
+     *   operationId="getAllTracks",
      *   produces={"application/json"},
      *   @SWG\Parameter(ref="#/parameters/RequestedWith"),
      *   @SWG\Parameter(ref="#/parameters/Pagination.Page"),
@@ -44,7 +44,7 @@ class ArtistController extends Controller
      *     type="string",
      *     description="Ordered column",
      *     required=false,
-     *     enum={"id", "name", "updated_at"}
+     *     enum={"id", "title", "released", "updated_at"}
      *   ),
      *   @SWG\Parameter(ref="#/parameters/Sorting"),
      *   @SWG\Parameter(
@@ -53,14 +53,14 @@ class ArtistController extends Controller
      *     type="array",
      *     description="Includes relationship",
      *     required=false,
-     *     items={"albums", "albums.songs", "songs", "songs.album"},
+     *     items={"artist", "album"},
      *     collectionFormat="csv",
-     *     enum={"albums", "albums.songs", "songs", "songs.album"}
+     *     enum={"artist", "album"}
      *   ),
      *   @SWG\Response(
      *     response=200,
      *     description="Successful operation",
-     *     @SWG\Schema(type="array", @SWG\Items(ref="#/definitions/Artist"))
+     *     @SWG\Schema(type="array", @SWG\Items(ref="#/definitions/track"))
      *   ),
      *   @SWG\Response(response=400, ref="#/responses/BadRequest"),
      *   @SWG\Response(response=401, ref="#/responses/Unauthorized"),
@@ -80,7 +80,7 @@ class ArtistController extends Controller
             $item = $this->repo->get($page, $limit, $order, $sort);
 
             if($item){
-                return $this->buildCollectionResponse($item, new ArtistTransformer, $include);
+                return $this->buildCollectionResponse($item, new SongTransformer, $include);
             }else{
                 return response(null, Response::HTTP_NO_CONTENT);
             }
@@ -93,20 +93,20 @@ class ArtistController extends Controller
 
 
     /**
-     * @SWG\Get(path="/artist/{id}",
+     * @SWG\Get(path="/track/{id}",
      *   security={
      *     {"demo_auth": {}}
      *   },
-     *   tags={"Artist"},
-     *   summary="Get artist",
+     *   tags={"Track"},
+     *   summary="Get Track",
      *   description="",
-     *   operationId="getArtist",
+     *   operationId="getTrack",
      *   produces={"application/json"},
      *   @SWG\Parameter(
      *     in="path",
      *     name="id",
      *     type="string",
-     *     description="Artist id",
+     *     description="Track id",
      *     required=true
      *   ),
      *   @SWG\Parameter(ref="#/parameters/RequestedWith"),
@@ -116,14 +116,14 @@ class ArtistController extends Controller
      *     type="array",
      *     description="Includes relationship",
      *     required=false,
-     *     items={"albums", "albums.songs", "songs", "songs.album"},
+     *     items={"Tracks", "album"},
      *     collectionFormat="csv",
-     *     enum={"albums", "albums.songs", "songs", "songs.album"}
+     *     enum={"Tracks", "album"}
      *   ),
      *   @SWG\Response(
      *     response=200,
      *     description="Successful operation",
-     *     @SWG\Schema(type="object", @SWG\Items(ref="#/definitions/Artist"))
+     *     @SWG\Schema(type="object", @SWG\Items(ref="#/definitions/track"))
      *   ),
      *   @SWG\Response(response=400, ref="#/responses/BadRequest"),
      *   @SWG\Response(response=401, ref="#/responses/Unauthorized"),
@@ -138,7 +138,7 @@ class ArtistController extends Controller
 
             $item = $this->repo->find($id);
 
-            return $this->buildItemResponse($item, new ArtistTransformer, $include);
+            return $this->buildItemResponse($item, new SongTransformer, $include);
         }catch (HttpException $e){
             throw new HttpException($e->getStatusCode(), $e->getMessage());
         }catch(ModelNotFoundException $e){
@@ -149,21 +149,21 @@ class ArtistController extends Controller
     }
 
     /**
-     * @SWG\Post(path="/artist",
+     * @SWG\Post(path="/track",
      *   security={
      *     {"demo_auth": {}}
      *   },
-     *   tags={"Artist"},
-     *   summary="Create artist",
+     *   tags={"Track"},
+     *   summary="Create Track",
      *   description="",
-     *   operationId="createArtist",
+     *   operationId="createTrack",
      *   produces={"application/json"},
      *   @SWG\Parameter(
      *     in="body",
      *     name="payload",
-     *     description="Artist",
+     *     description="Track",
      *     required=true,
-     *     @SWG\Schema(ref="#/definitions/Artist")
+     *     @SWG\Schema(ref="#/definitions/track")
      *   ),
      *   @SWG\Parameter(ref="#/parameters/RequestedWith"),
      *   @SWG\Response(response=201, ref="#/responses/Created"),
@@ -197,28 +197,28 @@ class ArtistController extends Controller
     }
 
     /**
-     * @SWG\Patch(path="/artist/{id}",
+     * @SWG\Patch(path="/track/{id}",
      *   security={
      *     {"demo_auth": {}}
      *   },
-     *   tags={"Artist"},
-     *   summary="Update artist",
+     *   tags={"Track"},
+     *   summary="Update Track",
      *   description="",
-     *   operationId="updateArtist",
+     *   operationId="updateTrack",
      *   produces={"application/json"},
      *   @SWG\Parameter(
      *     in="path",
      *     name="id",
      *     type="string",
-     *     description="Artist id",
+     *     description="Track id",
      *     required=true
      *   ),
      *   @SWG\Parameter(
      *     in="body",
      *     name="payload",
-     *     description="Artist",
+     *     description="Track",
      *     required=true,
-     *     @SWG\Schema(ref="#/definitions/Artist")
+     *     @SWG\Schema(ref="#/definitions/track")
      *   ),
      *   @SWG\Parameter(ref="#/parameters/RequestedWith"),
      *   @SWG\Response(response=202, ref="#/responses/Accepted"),
@@ -256,20 +256,20 @@ class ArtistController extends Controller
     }
 
     /**
-     * @SWG\Delete(path="/artist/{id}",
+     * @SWG\Delete(path="/track/{id}",
      *   security={
      *     {"demo_auth": {}}
      *   },
-     *   tags={"Artist"},
-     *   summary="Remove artist",
+     *   tags={"Track"},
+     *   summary="Remove Track",
      *   description="",
-     *   operationId="deleteArtist",
+     *   operationId="deleteTrack",
      *   produces={"application/json"},
      *   @SWG\Parameter(
      *     in="path",
      *     name="id",
      *     type="string",
-     *     description="Artist id",
+     *     description="Track id",
      *     required=true
      *   ),
      *   @SWG\Parameter(ref="#/parameters/RequestedWith"),

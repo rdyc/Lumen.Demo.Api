@@ -28,13 +28,15 @@ class Artist extends BaseModel
      * @var array
      */
     protected $fillable = [
-        'name', 'active', 'created_at', 'updated_at', 'deleted_at'
+        'name', 
+        'active'
     ];
 
-    /** Properties
+    /** 
+     * Override default sort direction
      *  @var string
      */
-    protected $name;
+    protected $defaultSort = 'desc';
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\hasMany
@@ -52,24 +54,5 @@ class Artist extends BaseModel
         return $this->hasManyThrough('App\Models\Song', 'App\Models\Album', 'artist_id', 'album_id');
     }
 
-    public function onCreated(){
-        return [
-            'id' => $this->id,
-            'created_at' => $this->created_at,
-        ];
-    }
-
-    public function onUpdated(){
-        return [
-            'id' => $this->id,
-            'updated_at' => $this->updated_at,
-        ];
-    }
-
-    public function onDeleted(){
-        return [
-            'id' => $this->id,
-            'deleted_at' => $this->deleted_at,
-        ];
-    }
+    
 }
