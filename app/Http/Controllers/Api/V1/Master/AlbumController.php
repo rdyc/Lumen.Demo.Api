@@ -178,7 +178,9 @@ class AlbumController extends Controller
         try{
             // statements goes here
             $this->validate($request, [
-                'name' => 'required|string|max:50',
+                'artist_id' => 'required|int',
+                'title' => 'required|string|max:50',
+                'released' => 'required|date',
                 'active' => 'required|boolean'
             ]);
 
@@ -233,7 +235,9 @@ class AlbumController extends Controller
         try{
             // statements goes here
             $this->validate($request, [
-                'name' => 'string|max:50',
+                'artist_id' => 'int',
+                'title' => 'string|max:50',
+                'released' => 'date',
                 'active' => 'boolean'
             ]);
 

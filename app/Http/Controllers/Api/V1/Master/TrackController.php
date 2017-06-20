@@ -178,7 +178,9 @@ class TrackController extends Controller
         try{
             // statements goes here
             $this->validate($request, [
-                'name' => 'required|string|max:50',
+                'track' => 'required|int',
+                'title' => 'required|string|max:50',
+                'album_id' => 'required|int',
                 'active' => 'required|boolean'
             ]);
 
@@ -233,7 +235,9 @@ class TrackController extends Controller
         try{
             // statements goes here
             $this->validate($request, [
-                'name' => 'string|max:50',
+                'track' => 'int',
+                'title' => 'string|max:50',
+                'album_id' => 'int',
                 'active' => 'boolean'
             ]);
 

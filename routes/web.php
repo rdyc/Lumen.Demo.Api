@@ -17,7 +17,11 @@ $app->get('/', function () use ($app) {
 
 $app->get('/docs[/{version}]', 'SwaggerController@get');
 
-$app->group(['middleware' => 'auth', 'prefix' => 'v1', 'namespace' => 'Api\V1'], function () use ($app) {
+$app->group([
+    'middleware' => 'auth',
+    'prefix' => 'v1',
+    'namespace' => 'Api\V1'
+], function () use ($app) {
     $app->group(['prefix' => 'whoami'], function () use ($app) {
         $app->get('/', 'WhoamiController@get');
     });
