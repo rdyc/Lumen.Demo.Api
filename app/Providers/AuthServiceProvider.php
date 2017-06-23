@@ -2,9 +2,7 @@
 
 namespace App\Providers;
 
-use App\Models\OauthAccessToken;
-use App\Models\User;
-use Firebase\JWT\JWT;
+use GuzzleHttp\Client;
 use Illuminate\Support\ServiceProvider;
 
 class AuthServiceProvider extends ServiceProvider
@@ -32,29 +30,39 @@ class AuthServiceProvider extends ServiceProvider
         // the User instance via an API token or any other method necessary.
 
         $this->app['auth']->viaRequest('api', function ($request) {
-            /*if ($request->input('api_token')) {
-                return User::where('api_token', $request->input('api_token'))->first();
-            }*/
-
             $user = null;
 
-            if ($request->header('Authorization')) {
-                try {
-                    $jwt = explode(' ', $request->header('Authorization')); // split -> Bearer <token>
+            $authorization = $request->header('Authorization');
 
-                    if (!empty($jwt[1])) {
-                        $decoded = JWT::decode($jwt[1], file_get_contents(storage_path() . '/oauth-public.key'), ['RS256']);
-
-                        if ($decoded) {
-                            $user = OauthAccessToken::find($decoded->jti)->user;
-                        }
-                    }
-                } catch (\Exception $e) {
-                    throw new \Exception($e->getMessage());
-                }
+            if ($authorization) {
+                $user = $this->getUser($authorization);
             }
 
             return $user;
         });
+    }
+
+    /**
+     * Retrieve user information from oauth server.
+     *
+     * @param $authorization
+     * @return null|\App\Models\User
+     */
+    private function getUser($authorization)
+    {
+        $http = new Client([
+            'base_uri' => config('oauth.baseUri'),
+            'headers' => [
+                'Authorization' => $authorization,
+                'X-Requested-With' => 'XMLHttpRequest'
+            ]
+        ]);
+
+        $response = $http->get(config('oauth.uriUser'));
+
+        if ($response->getStatusCode() === 200)
+            return json_decode((string)$response->getBody(), true);
+        else
+            return null;
     }
 }

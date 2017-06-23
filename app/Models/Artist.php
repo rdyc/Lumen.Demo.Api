@@ -13,7 +13,7 @@ class Artist extends BaseModel
      *
      * @var string
      */
-    protected $connection = 'mysql.core';
+    protected $connection = 'mysql';
 
     /**
      * The table associated with the model.

@@ -9,8 +9,8 @@
         "laravel/lumen-framework": "5.4.*",
         "vlucas/phpdotenv": "~2.2",
         "zircote/swagger-php": "^2.0",
-        "firebase/php-jwt": "^4.0",
-        "league/fractal": "^0.16.0"
+        "league/fractal": "^0.16.0",
+        "guzzlehttp/guzzle": "^6.3"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",

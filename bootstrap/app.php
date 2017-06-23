@@ -37,6 +37,7 @@ $app->withEloquent();
 |
 */
 
+$app->configure('oauth');
 $app->configure('cors');
 $app->configure('database');
 

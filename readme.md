@@ -19,3 +19,9 @@ If you discover a security vulnerability within Lumen, please send an e-mail to 
 ## License
 
 The Lumen framework is open-sourced software licensed under the [MIT license](http://opensource.org/licenses/MIT)
+
+## Testing
+
+In a time you need to run all defined code testing, just run bellow command
+
+`$ vendor/bin/phpunit`

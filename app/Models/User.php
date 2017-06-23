@@ -16,7 +16,7 @@ class User extends BaseModel implements AuthenticatableContract, AuthorizableCon
      *
      * @var string
      */
-    protected $connection = 'mysql.oauth';
+    protected $connection = 'mysql';
 
     /**
      * The attributes that are mass assignable.
