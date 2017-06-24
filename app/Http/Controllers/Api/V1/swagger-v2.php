@@ -25,7 +25,11 @@
  *   type="oauth2",
  *   authorizationUrl="http://localhost:8001/oauth/authorize",
  *   tokenUrl="http://localhost:8001/oauth/token",
- *   flow="implicit"
+ *   flow="implicit",
+ *   scopes={
+ *     "profiles-read": "Read user profiles",
+ *     "profiles-write": "Modify user profiles"
+ *   }
  * )
  *
  * @SWG\Parameter(
