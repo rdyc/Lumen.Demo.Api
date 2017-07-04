@@ -3,7 +3,9 @@
 namespace App\Providers;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ClientException;
 use Illuminate\Support\ServiceProvider;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -50,19 +52,26 @@ class AuthServiceProvider extends ServiceProvider
      */
     private function getUser($authorization)
     {
-        $http = new Client([
-            'base_uri' => config('oauth.baseUri'),
-            'headers' => [
-                'Authorization' => $authorization,
-                'X-Requested-With' => 'XMLHttpRequest'
-            ]
-        ]);
+        try{
+            $http = new Client([
+                'base_uri' => config('oauth.baseUri'),
+                'headers' => [
+                    'Authorization' => $authorization,
+                    'X-Requested-With' => 'XMLHttpRequest'
+                ]
+            ]);
 
-        $response = $http->get(config('oauth.uriUser'));
+            $response = $http->get(config('oauth.uriUser'));
 
-        if ($response->getStatusCode() === 200)
-            return json_decode((string)$response->getBody(), true);
-        else
-            return null;
+            if ($response->getStatusCode() === 200)
+                return json_decode((string)$response->getBody(), true);
+            else
+                return null;
+        }catch(ClientException $e){
+            $response = $e->getResponse();
+            $responseBody = json_decode($response->getBody()->getContents());
+            
+            throw new HttpException($response->getStatusCode(), $responseBody->message);
+        }
     }
 }

@@ -14,7 +14,7 @@ class WhoamiController extends Controller
     /**
      * @SWG\Get(path="/whoami",
      *   security={
-     *     {"demo_auth": {}}
+     *     {"demo_auth": {"profiles-read"}}
      *   },
      *   tags={"WhoAmI"},
      *   summary="Retrieve current user",
