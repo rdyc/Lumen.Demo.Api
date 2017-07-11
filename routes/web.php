@@ -49,4 +49,15 @@ $app->group([
         $app->patch('/{id}', 'Master\TrackController@patch');
         $app->delete('/{id}', 'Master\TrackController@delete');
     });
+
+
+    // TAP
+    $app->group(['prefix' => 'general'], function () use ($app) {
+        $app->get('/', 'Master\TAP\GeneralController@get');
+        $app->get('/{id}', 'Master\TAP\GeneralController@getId');
+        $app->post('/', 'Master\TAP\GeneralController@post');
+        $app->patch('/{id}', 'Master\TAP\GeneralController@patch');
+        $app->delete('/{id}', 'Master\TAP\GeneralController@delete');
+    });
+
 });

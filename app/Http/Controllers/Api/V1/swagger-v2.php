@@ -82,7 +82,7 @@
  *     ),
  *     @SWG\Property(
  *          property="created_at",
- *          type="date",
+ *          type="string",
  *          format="date-time"
  *     )
  * )
@@ -96,6 +96,20 @@
  *     ),
  *     @SWG\Property(
  *          property="updated_at",
+ *          type="string",
+ *          format="date-time"
+ *     )
+ * )
+ *
+ * @SWG\Definition(
+ *     definition="deleted",
+ *     @SWG\Property(
+ *          property="id",
+ *          type="integer",
+ *          format="int64"
+ *     ),
+ *     @SWG\Property(
+ *          property="deleted_at",
  *          type="string",
  *          format="date-time"
  *     )
@@ -146,6 +160,11 @@
  *   response="Created",
  *   description="Created",
  *   @SWG\Schema(ref="#/definitions/created")
+ * ),
+ * @SWG\Response(
+ *   response="Deleted",
+ *   description="Deleted",
+ *   @SWG\Schema(ref="#/definitions/deleted")
  * ),
  * @SWG\Response(
  *   response="GeneralError",

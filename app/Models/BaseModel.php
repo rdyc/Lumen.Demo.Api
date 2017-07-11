@@ -2,11 +2,15 @@
 
 namespace App\Models;
 
+use App\Models\EventUpdater;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 abstract class BaseModel extends Model
 {
+    use SoftDeletes;
+    use EventUpdater;
 
     /**
      * Indicates if the model should be timestamped.
@@ -54,6 +58,7 @@ abstract class BaseModel extends Model
      * @var array
      */
     protected $hidden = [
+        'deleted_by',
         'deleted_at'
     ];
 
@@ -80,7 +85,7 @@ abstract class BaseModel extends Model
     public function onCreated()
     {
         return [
-            'id' => $this->id,
+            'id' => $this->{$this->getKeyName()},
             'created_at' => $this->formatDate($this->attributes['created_at'])
         ];
     }
@@ -88,7 +93,7 @@ abstract class BaseModel extends Model
     public function onUpdated()
     {
         return [
-            'id' => $this->id,
+            'id' => $this->{$this->getKeyName()},
             'updated_at' => $this->formatDate($this->attributes['updated_at']),
         ];
     }
@@ -96,7 +101,7 @@ abstract class BaseModel extends Model
     public function onDeleted()
     {
         return [
-            'id' => $this->id,
+            'id' => $this->{$this->getKeyName()},
             'deleted_at' => $this->formatDate($this->attributes['deleted_at']),
         ];
     }

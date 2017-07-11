@@ -19,6 +19,9 @@ class CreateSongTable extends Migration
             $table->string('title', 225);
             $table->integer('album_id');
             $table->boolean('active');
+            $table->string('created_by', 150)->nullable();
+            $table->string('updated_by', 150)->nullable();
+            $table->string('deleted_by', 150)->nullable();
             $table->timestamps();
             $table->softDeletes();
             //$table->foreign('album_id')->references('id')->on('fk_song_album_id');

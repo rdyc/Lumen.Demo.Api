@@ -19,6 +19,9 @@ class CreateAlbumTable extends Migration
             $table->string('title', 225);
             $table->date('released');
             $table->boolean('active');
+            $table->string('created_by', 150)->nullable();
+            $table->string('updated_by', 150)->nullable();
+            $table->string('deleted_by', 150)->nullable();
             $table->timestamps();
             $table->softDeletes();
             //$table->foreign('artist_id')->references('id')->on('fk_album_artist_id');
