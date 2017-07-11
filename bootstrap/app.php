@@ -74,7 +74,8 @@ $app->singleton(
 */
 
 $app->middleware([
-    App\Http\Middleware\JsonRequestMiddleware::class
+    App\Http\Middleware\JsonRequestMiddleware::class,
+    Barryvdh\Cors\HandleCors::class,
 ]);
 
  $app->routeMiddleware([
