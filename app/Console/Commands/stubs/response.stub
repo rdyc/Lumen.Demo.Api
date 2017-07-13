@@ -1,0 +1,28 @@
+<?php
+
+namespace App\Http\Responses;
+
+/**
+ * @SWG\Definition(@SWG\Xml(name="DummyClassResponse"))
+ */
+class DummyClassResponse extends BaseLog
+{
+    /**
+     * @SWG\Property
+     * @var string
+     */
+    public $code;
+
+    public function __construct($model)
+    {
+        $this->code = $model->column_code;
+        $this->createdBy = $model->created_by;
+        $this->createdAt = $model->created_at;
+        $this->updatedBy = $model->updated_by;
+        $this->updatedAt = $model->updated_at;
+    }
+
+    public function serialize(){
+        return get_object_vars($this);
+    }
+}

@@ -1,0 +1,15 @@
+<?php
+
+namespace App\Http\Responses;
+
+/**
+ * @SWG\Definition(@SWG\Xml(name="DummyClassCollectionResponse"))
+ */
+class DummyClassCollectionResponse extends BaseCollection
+{
+    /**
+     * @SWG\Property
+     * @var DummyClassResponse[]
+     */
+    protected $data;
+}

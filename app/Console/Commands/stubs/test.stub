@@ -1,0 +1,18 @@
+<?php
+
+class DummyClassControllerTest extends TestCase
+{
+    function __construct(){
+        $faker = Faker\Factory::create();
+
+        $this->setApiPath('v1', 'DummyPath');
+
+        $this->setPostData([
+            'code' => $faker->text(10)
+        ]);
+
+        $this->setPatchData([
+            'code' => 'TST!'
+        ]);
+    }
+}
