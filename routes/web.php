@@ -18,7 +18,10 @@ $app->get('/', function () use ($app) {
 $app->get('/docs[/{version}]', 'SwaggerController@get');
 
 $app->group([
-    'middleware' => 'auth',
+    'middleware' => [
+        'auth', 
+        'cors'
+    ],
     'prefix' => 'v1',
     'namespace' => 'Api\V1'
 ], function () use ($app) {
