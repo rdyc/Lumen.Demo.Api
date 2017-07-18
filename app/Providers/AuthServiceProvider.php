@@ -39,7 +39,7 @@ class AuthServiceProvider extends ServiceProvider
                 $user = $this->getUser($authorization);
             }
 
-            return (object) $user;
+            return $user;
         });
     }
 
