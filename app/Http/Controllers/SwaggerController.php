@@ -13,7 +13,7 @@ class SwaggerController extends Controller
             $http_code = Response::HTTP_OK;
             $app_path =app('path');
 
-            $controller_path = $app_path . '/Http/Controllers/Api/' . strtoupper($version);
+            $controller_path = $app_path . '/Http/Controllers/' . strtoupper($version);
             $response_path = $app_path . '/Http/Responses';
             $request_path = $app_path . '/Http/Requests';
 

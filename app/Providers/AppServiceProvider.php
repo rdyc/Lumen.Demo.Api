@@ -20,9 +20,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind('App\Repositories\Contracts\IArtistRepository', 'App\Repositories\ArtistRepository', true);
         $this->app->bind('App\Repositories\Contracts\IAlbumRepository', 'App\Repositories\AlbumRepository', true);
         $this->app->bind('App\Repositories\Contracts\ISongRepository', 'App\Repositories\SongRepository', true);
-
-        // TAP
-        $this->app->bind('App\Repositories\Contracts\TAP\IMasterGeneralRepository', 'App\Repositories\TAP\MasterGeneralRepository', true);
+        $this->app->bind('App\Repositories\Contracts\IMasterGeneralRepository', 'App\Repositories\MasterGeneralRepository', true);
         
     }
 }

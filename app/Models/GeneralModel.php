@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models\TAP;
+namespace App\Models;
 
 use App\Models\BaseModel;
 

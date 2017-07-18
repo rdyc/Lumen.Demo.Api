@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Repositories\Contracts\TAP;
+namespace App\Repositories\Contracts;
 
 use App\Repositories\Contracts\IGenericRepository;
 

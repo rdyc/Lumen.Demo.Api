@@ -42,7 +42,7 @@ class ApiTransformerMakeCommand extends GeneratorCommand
         $name = trim($this->argument('name'));
         $this->base_name = $name;
 
-        return $name . 'Transformer';
+        return $name . 'ModelTransformer';
     }
 
     /**

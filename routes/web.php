@@ -23,7 +23,7 @@ $app->group([
         'cors'
     ],
     'prefix' => 'v1',
-    'namespace' => 'Api\V1'
+    'namespace' => 'V1'
 ], function () use ($app) {
     $app->group(['prefix' => 'whoami'], function () use ($app) {
         $app->get('/', 'WhoamiController@get');
@@ -56,11 +56,11 @@ $app->group([
 
     // TAP
     $app->group(['prefix' => 'general'], function () use ($app) {
-        $app->get('/', 'Master\TAP\GeneralController@get');
-        $app->get('/{id}', 'Master\TAP\GeneralController@getId');
-        $app->post('/', 'Master\TAP\GeneralController@post');
-        $app->patch('/{id}', 'Master\TAP\GeneralController@patch');
-        $app->delete('/{id}', 'Master\TAP\GeneralController@delete');
+        $app->get('/', 'Master\GeneralController@get');
+        $app->get('/{id}', 'Master\GeneralController@getId');
+        $app->post('/', 'Master\GeneralController@post');
+        $app->patch('/{id}', 'Master\GeneralController@patch');
+        $app->delete('/{id}', 'Master\GeneralController@delete');
     });
 
 });

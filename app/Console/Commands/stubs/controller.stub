@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api\V1;
+namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\DummyClassPatchRequest;
@@ -57,7 +57,7 @@ class DummyClassController extends Controller
      *   @SWG\Response(response=400, ref="#/responses/BadRequest"),
      *   @SWG\Response(response=401, ref="#/responses/Unauthorized"),
      *   @SWG\Response(response=403, ref="#/responses/Forbidden"),
-     *   @SWG\Response(response=500, ref="#/responses/DummyPathError")
+     *   @SWG\Response(response=500, ref="#/responses/GeneralError")
      * )
      **/
     public function get()
@@ -108,7 +108,7 @@ class DummyClassController extends Controller
      *   @SWG\Response(response=400, ref="#/responses/BadRequest"),
      *   @SWG\Response(response=401, ref="#/responses/Unauthorized"),
      *   @SWG\Response(response=403, ref="#/responses/Forbidden"),
-     *   @SWG\Response(response=500, ref="#/responses/DummyPathError")
+     *   @SWG\Response(response=500, ref="#/responses/GeneralError")
      * )
      **/
     public function getId($id)
@@ -148,7 +148,7 @@ class DummyClassController extends Controller
      *   @SWG\Response(response=400, ref="#/responses/BadRequest"),
      *   @SWG\Response(response=401, ref="#/responses/Unauthorized"),
      *   @SWG\Response(response=403, ref="#/responses/Forbidden"),
-     *   @SWG\Response(response=500, ref="#/responses/DummyPathError")
+     *   @SWG\Response(response=500, ref="#/responses/GeneralError")
      * )
      **/
     public function post(Request $request)
@@ -199,7 +199,7 @@ class DummyClassController extends Controller
      *   @SWG\Response(response=400, ref="#/responses/BadRequest"),
      *   @SWG\Response(response=401, ref="#/responses/Unauthorized"),
      *   @SWG\Response(response=403, ref="#/responses/Forbidden"),
-     *   @SWG\Response(response=500, ref="#/responses/DummyPathError")
+     *   @SWG\Response(response=500, ref="#/responses/GeneralError")
      * )
      **/
     public function patch($id, Request $request)
@@ -213,7 +213,7 @@ class DummyClassController extends Controller
 
             return response($updated, Response::HTTP_ACCEPTED);
         } catch (ValidationException $e) {
-            return $e->response;
+            throw new HttpException(Response::HTTP_UNPROCESSABLE_ENTITY, $e->response);
         } catch (HttpException $e) {
             throw new HttpException($e->getStatusCode(), $e->getMessage());
         } catch (ModelNotFoundException $e) {
@@ -245,7 +245,7 @@ class DummyClassController extends Controller
      *   @SWG\Response(response=400, ref="#/responses/BadRequest"),
      *   @SWG\Response(response=401, ref="#/responses/Unauthorized"),
      *   @SWG\Response(response=403, ref="#/responses/Forbidden"),
-     *   @SWG\Response(response=500, ref="#/responses/DummyPathError")
+     *   @SWG\Response(response=500, ref="#/responses/GeneralError")
      * )
      **/
     public function delete($id)

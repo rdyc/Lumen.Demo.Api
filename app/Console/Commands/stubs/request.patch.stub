@@ -44,9 +44,9 @@ class DummyClassPatchRequest
 
     public function parse()
     {
-        $result = array(
+        $result = [
             'column_code' => $this->code
-        );
+        ];
 
         return array_filter($result, 'strlen');
     }

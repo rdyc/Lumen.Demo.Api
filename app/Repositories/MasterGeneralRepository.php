@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Repositories\TAP;
+namespace App\Repositories;
 
-use App\Models\TAP\GeneralModel;
+use App\Models\GeneralModel;
 use App\Repositories\GenericRepository;
-use App\Repositories\Contracts\TAP\IMasterGeneralRepository;
+use App\Repositories\Contracts\IMasterGeneralRepository;
 use Illuminate\Support\Facades\App;
 
 class MasterGeneralRepository extends GenericRepository implements IMasterGeneralRepository

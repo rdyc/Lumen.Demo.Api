@@ -1,39 +1,41 @@
 <?php
 
-namespace App\Http\Controllers\Api\V1\Master;
+namespace App\Http\Controllers\V1\Master;
 
 use App\Http\Controllers\Controller;
-use App\Repositories\Contracts\IAlbumRepository;
-use App\Transformers\AlbumTransformer;
+use App\Http\Requests\GeneralPatchRequest;
+use App\Http\Requests\GeneralPostRequest;
+use App\Repositories\Contracts\IMasterGeneralRepository;
+use App\Transformers\GeneralModelTransformer;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Validation\ValidationException;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
-use League\Fractal\Pagination\Cursor;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
-class AlbumController extends Controller
+class GeneralController extends Controller
 {
+
     /**
-    * @var \App\Repositories\Contracts\IAlbumRepository
-    */
+     * @var \App\Repositories\Contracts\IMasterGeneralRepository
+     */
     private $repo;
 
-    public function __construct(IAlbumRepository $repo)
+    public function __construct(IMasterGeneralRepository $repo)
     {
         $this->repo = $repo;
     }
 
     /**
-     * @SWG\Get(path="/album",
+     * @SWG\Get(path="/general",
      *   security={
      *     {"demo_auth": {}}
      *   },
-     *   tags={"Album"},
-     *   summary="Get all Albums",
+     *   tags={"Master General"},
+     *   summary="Get all general data",
      *   description="",
-     *   operationId="getAllAlbums",
+     *   operationId="getAllGeneral",
      *   produces={"application/json"},
      *   @SWG\Parameter(ref="#/parameters/RequestedWith"),
      *   @SWG\Parameter(ref="#/parameters/Pagination.Page"),
@@ -44,23 +46,13 @@ class AlbumController extends Controller
      *     type="string",
      *     description="Ordered column",
      *     required=false,
-     *     enum={"id", "title", "released", "updated_at"}
+     *     enum={"general_code", "description_code", "description"}
      *   ),
      *   @SWG\Parameter(ref="#/parameters/Sorting"),
-     *   @SWG\Parameter(
-     *     in="query",
-     *     name="include",
-     *     type="array",
-     *     description="Includes relationship",
-     *     required=false,
-     *     items={"artist", "songs"},
-     *     collectionFormat="csv",
-     *     enum={"artist", "songs"}
-     *   ),
      *   @SWG\Response(
      *     response=200,
      *     description="Successful operation",
-     *     @SWG\Schema(type="array", @SWG\Items(ref="#/definitions/Album"))
+     *     @SWG\Schema(ref="#/definitions/GeneralCollectionResponse")
      *   ),
      *   @SWG\Response(response=400, ref="#/responses/BadRequest"),
      *   @SWG\Response(response=401, ref="#/responses/Unauthorized"),
@@ -70,8 +62,7 @@ class AlbumController extends Controller
      **/
     public function get()
     {
-        try{
-            $include = Input::get('include');
+        try {
             $page = Input::get('page', 1);
             $limit = Input::get('limit', 10);
             $order = Input::get('order');
@@ -79,51 +70,40 @@ class AlbumController extends Controller
 
             $item = $this->repo->get($page, $limit, $order, $sort);
 
-            if($item){
-                return $this->buildCollectionResponse($item, new AlbumTransformer, $include);
-            }else{
+            if ($item) {
+                return $this->buildCollectionResponse($item, new GeneralModelTransformer);
+            } else {
                 return response(null, Response::HTTP_NO_CONTENT);
             }
-        }catch (HttpException $e){
+        } catch (HttpException $e) {
             throw new HttpException($e->getStatusCode(), $e->getMessage());
-        }catch (\Exception $e){
+        } catch (\Exception $e) {
             throw new HttpException(Response::HTTP_INTERNAL_SERVER_ERROR, $e->getMessage());
         }
     }
 
-
     /**
-     * @SWG\Get(path="/album/{id}",
+     * @SWG\Get(path="/general/{id}",
      *   security={
      *     {"demo_auth": {}}
      *   },
-     *   tags={"Album"},
-     *   summary="Get Album",
+     *   tags={"Master General"},
+     *   summary="Get general data",
      *   description="",
-     *   operationId="getAlbum",
+     *   operationId="getGeneral",
      *   produces={"application/json"},
      *   @SWG\Parameter(
      *     in="path",
      *     name="id",
      *     type="string",
-     *     description="Album id",
+     *     description="Artist id",
      *     required=true
      *   ),
      *   @SWG\Parameter(ref="#/parameters/RequestedWith"),
-     *   @SWG\Parameter(
-     *     in="query",
-     *     name="include",
-     *     type="array",
-     *     description="Includes relationship",
-     *     required=false,
-     *     items={"albums", "songs"},
-     *     collectionFormat="csv",
-     *     enum={"albums", "songs"}
-     *   ),
      *   @SWG\Response(
      *     response=200,
      *     description="Successful operation",
-     *     @SWG\Schema(type="object", @SWG\Items(ref="#/definitions/Album"))
+     *     @SWG\Schema(ref="#/definitions/GeneralItemResponse")
      *   ),
      *   @SWG\Response(response=400, ref="#/responses/BadRequest"),
      *   @SWG\Response(response=401, ref="#/responses/Unauthorized"),
@@ -133,37 +113,35 @@ class AlbumController extends Controller
      **/
     public function getId($id)
     {
-        try{
-            $include = Input::get('include', null);
-
+        try {
             $item = $this->repo->find($id);
 
-            return $this->buildItemResponse($item, new AlbumTransformer, $include);
-        }catch (HttpException $e){
+            return $this->buildItemResponse($item, new GeneralModelTransformer);
+        } catch (HttpException $e) {
             throw new HttpException($e->getStatusCode(), $e->getMessage());
-        }catch(ModelNotFoundException $e){
+        } catch (ModelNotFoundException $e) {
             throw new HttpException(Response::HTTP_NOT_FOUND, $e->getMessage());
-        }catch (\Exception $e){
+        } catch (\Exception $e) {
             throw new HttpException(Response::HTTP_INTERNAL_SERVER_ERROR, $e->getMessage());
         }
     }
 
     /**
-     * @SWG\Post(path="/album",
+     * @SWG\Post(path="/general",
      *   security={
      *     {"demo_auth": {}}
      *   },
-     *   tags={"Album"},
-     *   summary="Create Album",
+     *   tags={"Master General"},
+     *   summary="Create general data",
      *   description="",
-     *   operationId="createAlbum",
+     *   operationId="createGeneral",
      *   produces={"application/json"},
      *   @SWG\Parameter(
      *     in="body",
      *     name="payload",
-     *     description="Album",
+     *     description="General data",
      *     required=true,
-     *     @SWG\Schema(ref="#/definitions/Album")
+     *     @SWG\Schema(ref="#/definitions/GeneralPostRequest")
      *   ),
      *   @SWG\Parameter(ref="#/parameters/RequestedWith"),
      *   @SWG\Response(response=201, ref="#/responses/Created"),
@@ -175,52 +153,46 @@ class AlbumController extends Controller
      **/
     public function post(Request $request)
     {
-        try{
-            // statements goes here
-            $this->validate($request, [
-                'artist_id' => 'required|int',
-                'title' => 'required|string|max:50',
-                'released' => 'required|date',
-                'active' => 'required|boolean'
-            ]);
+        try {
+            $post = new GeneralPostRequest($request->all());
 
-            $model = $request->all();
+            $model = $post->parse();
 
             $updated = $this->repo->create($model);
 
             return response($updated, Response::HTTP_CREATED);
-        }catch (ValidationException $e){
-            return $e->response;
-        }catch (HttpException $e){
+        } catch (ValidationException $e) {
+            throw new HttpException(Response::HTTP_UNPROCESSABLE_ENTITY, $e->response);
+        } catch (HttpException $e) {
             throw new HttpException($e->getStatusCode(), $e->getMessage());
-        }catch (\Exception $e){
+        } catch (\Exception $e) {
             throw new HttpException(Response::HTTP_INTERNAL_SERVER_ERROR, $e->getMessage());
         }
     }
 
     /**
-     * @SWG\Patch(path="/album/{id}",
+     * @SWG\Patch(path="/general/{id}",
      *   security={
      *     {"demo_auth": {}}
      *   },
-     *   tags={"Album"},
-     *   summary="Update Album",
+     *   tags={"Master General"},
+     *   summary="Update general data",
      *   description="",
-     *   operationId="updateAlbum",
+     *   operationId="updateGeneral",
      *   produces={"application/json"},
      *   @SWG\Parameter(
      *     in="path",
      *     name="id",
      *     type="string",
-     *     description="Album id",
+     *     description="General Code",
      *     required=true
      *   ),
      *   @SWG\Parameter(
      *     in="body",
      *     name="payload",
-     *     description="Album",
+     *     description="General",
      *     required=true,
-     *     @SWG\Schema(ref="#/definitions/Album")
+     *     @SWG\Schema(ref="#/definitions/GeneralPatchRequest")
      *   ),
      *   @SWG\Parameter(ref="#/parameters/RequestedWith"),
      *   @SWG\Response(response=202, ref="#/responses/Accepted"),
@@ -232,52 +204,44 @@ class AlbumController extends Controller
      **/
     public function patch($id, Request $request)
     {
-        try{
-            // statements goes here
-            $this->validate($request, [
-                'artist_id' => 'int',
-                'title' => 'string|max:50',
-                'released' => 'date',
-                'active' => 'boolean'
-            ]);
+        try {
+            $patch = new GeneralPatchRequest($request->all());
 
-            $model = $request->all();
+            $model = $patch->parse();
 
-            if(empty($model)){
-                throw new HttpException(Response::HTTP_BAD_REQUEST, 'No properties found');
-            }
-
-            $updated = $this->repo->update((int) $id, $model);
+            $updated = $this->repo->update($id, $model);
 
             return response($updated, Response::HTTP_ACCEPTED);
-        }catch (HttpException $e){
+        } catch (ValidationException $e) {
+            return $e->response;
+        } catch (HttpException $e) {
             throw new HttpException($e->getStatusCode(), $e->getMessage());
-        }catch(ModelNotFoundException $e){
+        } catch (ModelNotFoundException $e) {
             throw new HttpException(Response::HTTP_NOT_FOUND, $e->getMessage());
-        }catch (\Exception $e){
+        } catch (\Exception $e) {
             throw new HttpException(Response::HTTP_INTERNAL_SERVER_ERROR, $e->getMessage());
         }
     }
 
     /**
-     * @SWG\Delete(path="/album/{id}",
+     * @SWG\Delete(path="/general/{id}",
      *   security={
      *     {"demo_auth": {}}
      *   },
-     *   tags={"Album"},
-     *   summary="Remove Album",
+     *   tags={"Master General"},
+     *   summary="Remove general data",
      *   description="",
-     *   operationId="deleteAlbum",
+     *   operationId="deleteGeneral",
      *   produces={"application/json"},
      *   @SWG\Parameter(
      *     in="path",
      *     name="id",
      *     type="string",
-     *     description="Album id",
+     *     description="General Code",
      *     required=true
      *   ),
      *   @SWG\Parameter(ref="#/parameters/RequestedWith"),
-     *   @SWG\Response(response=202, ref="#/responses/Accepted"),
+     *   @SWG\Response(response=202, ref="#/responses/Deleted"),
      *   @SWG\Response(response=400, ref="#/responses/BadRequest"),
      *   @SWG\Response(response=401, ref="#/responses/Unauthorized"),
      *   @SWG\Response(response=403, ref="#/responses/Forbidden"),
@@ -286,18 +250,17 @@ class AlbumController extends Controller
      **/
     public function delete($id)
     {
-        try{
+        try {
             // statements goes here
-            $deleted = $this->repo->delete((int) $id);
+            $deleted = $this->repo->delete($id);
 
             return response($deleted, Response::HTTP_ACCEPTED);
-        }catch (HttpException $e){
+        } catch (HttpException $e) {
             throw new HttpException($e->getStatusCode(), $e->getMessage());
-        }catch(ModelNotFoundException $e){
+        } catch (ModelNotFoundException $e) {
             throw new HttpException(Response::HTTP_NOT_FOUND, $e->getMessage());
-        }catch (\Exception $e){
+        } catch (\Exception $e) {
             throw new HttpException(Response::HTTP_INTERNAL_SERVER_ERROR, $e->getMessage());
         }
     }
-
 }

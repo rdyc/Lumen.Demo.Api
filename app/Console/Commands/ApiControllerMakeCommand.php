@@ -83,6 +83,6 @@ class ApiControllerMakeCommand extends GeneratorCommand
      */
     protected function getDefaultNamespace($rootNamespace)
     {
-        return $rootNamespace . '\Http\Controllers\Api\V1';
+        return $rootNamespace . '\Http\Controllers\V1';
     }
 }

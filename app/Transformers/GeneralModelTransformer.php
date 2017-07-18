@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Transformers\TAP;
+namespace App\Transformers;
 
 use App\Http\Responses\GeneralResponse;
-use App\Models\TAP\GeneralModel;
+use App\Models\GeneralModel;
 use Illuminate\Support\Facades\App;
 use League\Fractal\TransformerAbstract;
 
