@@ -13,13 +13,13 @@ trait EventUpdater {
         /*
         * During a model create Eloquent will also update the updated_at field so * need to have the updated_by field here as well * */
         static::creating(function($model) {
-            $model->created_by = Auth::user() ? Auth::user()->username : 'UnitTest';
+            $model->created_by = Auth::user()->email;
             
-            $model->updated_by = Auth::user() ? Auth::user()->username : 'UnitTest';
+            $model->updated_by = Auth::user()->email;
         });
  
         static::updating(function($model)  {
-            $model->updated_by = Auth::user() ? Auth::user()->username : 'UnitTest';
+            $model->updated_by = Auth::user()->email;
         });
         
         /*
@@ -27,7 +27,7 @@ trait EventUpdater {
          * deletes we need to save the model first with the deleted_by field
          * */
         static::deleting(function($model)  {
-            $model->deleted_by = Auth::user() ? Auth::user()->username : 'UnitTest';
+            $model->deleted_by = Auth::user()->email;
             $model->save();
         });
     }

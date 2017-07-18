@@ -37,9 +37,9 @@ abstract class TestCase extends Laravel\Lumen\Testing\TestCase
      * @test
      */
     public function get_status_code_should_be_200(){
-        $this->withoutMiddleware();
-        //$user = new App\Models\User(['email' => 'ruddycahyadi@gmail.com']);
-        //$this->be($user);
+        //$this->withoutMiddleware();
+        $user = new App\Models\User(['email' => 'PHPUnitTest']);
+        $this->be($user);
 
         $this->get('/'. $this->apiVersion . '/'. $this->apiPath)->seeStatusCode(200);
     }
@@ -49,9 +49,9 @@ abstract class TestCase extends Laravel\Lumen\Testing\TestCase
      * @depends get_status_code_should_be_200
      */
     public function post_status_code_should_be_201(){
-        $this->withoutMiddleware();
-        //$user = new App\Models\User(['email' => 'ruddycahyadi@gmail.com']);
-        //$this->be($user);
+        //$this->withoutMiddleware();
+        $user = new App\Models\User(['email' => 'PHPUnitTest']);
+        $this->be($user);
 
         $content = $this->post('/'. $this->apiVersion . '/'. $this->apiPath, $this->postData)->seeStatusCode(201)->response->getContent();
 
@@ -67,13 +67,13 @@ abstract class TestCase extends Laravel\Lumen\Testing\TestCase
      * @depends post_status_code_should_be_201
      */
     public function get_id_status_code_should_be_200($id){
+        //$this->withoutMiddleware();
+        $user = new App\Models\User(['email' => 'PHPUnitTest']);
+        $this->be($user);
+
         if(!$id){
             $this->assertFalse();
         }
-
-        $this->withoutMiddleware();
-        //$user = new App\Models\User(['email' => 'ruddycahyadi@gmail.com']);
-        //$this->be($user);
 
         $this->get('/'. $this->apiVersion . '/'. $this->apiPath .'/'. $id)
             ->seeStatusCode(200);
@@ -89,9 +89,9 @@ abstract class TestCase extends Laravel\Lumen\Testing\TestCase
      * @depends get_id_status_code_should_be_200
      */
     public function patch_status_code_should_be_202($id){
-        $this->withoutMiddleware();
-        //$user = new App\Models\User(['email' => 'ruddycahyadi@gmail.com']);
-        //$this->be($user);
+        //$this->withoutMiddleware();
+        $user = new App\Models\User(['email' => 'PHPUnitTest']);
+        $this->be($user);
 
         $this->patch('/'. $this->apiVersion . '/'. $this->apiPath .'/'. $id, $this->patchData)->seeStatusCode(202);
         
@@ -103,13 +103,13 @@ abstract class TestCase extends Laravel\Lumen\Testing\TestCase
      * @depends patch_status_code_should_be_202
      */
     public function get_patch_status_code_should_be_200($id){
+        //$this->withoutMiddleware();
+        $user = new App\Models\User(['email' => 'PHPUnitTest']);
+        $this->be($user);
+        
         if(!$id){
             $this->assertFalse();
         }
-
-        $this->withoutMiddleware();
-        //$user = new App\Models\User(['email' => 'ruddycahyadi@gmail.com']);
-        //$this->be($user);
 
         $this->get('/'. $this->apiVersion . '/'. $this->apiPath .'/'. $id)
             ->seeStatusCode(200);
@@ -123,9 +123,9 @@ abstract class TestCase extends Laravel\Lumen\Testing\TestCase
      * @depends get_patch_status_code_should_be_200
      */
     public function delete_status_code_should_be_202($id){
-        $this->withoutMiddleware();
-        //$user = new App\Models\User(['email' => 'ruddycahyadi@gmail.com']);
-        //$this->be($user);
+        //$this->withoutMiddleware();
+        $user = new App\Models\User(['email' => 'PHPUnitTest']);
+        $this->be($user);
 
         $this->delete('/'. $this->apiVersion . '/'. $this->apiPath .'/'. $id)->seeStatusCode(202);
 
@@ -137,13 +137,13 @@ abstract class TestCase extends Laravel\Lumen\Testing\TestCase
      * @depends delete_status_code_should_be_202
      */
     public function get_deleted_status_code_should_be_404($id){
+        //$this->withoutMiddleware();
+        $user = new App\Models\User(['email' => 'PHPUnitTest']);
+        $this->be($user);
+        
         if(!$id){
             $this->assertFalse();
         }
-
-        $this->withoutMiddleware();
-        //$user = new App\Models\User(['email' => 'ruddycahyadi@gmail.com']);
-        //$this->be($user);
 
         $this->get('/'. $this->apiVersion . '/'. $this->apiPath .'/'. $id)->seeStatusCode(404);
     }
