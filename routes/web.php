@@ -63,4 +63,13 @@ $app->group([
         $app->delete('/{id}', 'Master\GeneralController@delete');
     });
 
+    $app->group(['prefix' => 'document'], function () use ($app) {
+        $app->get('/', 'DocumentController@get');
+        $app->get('/{id}', 'DocumentController@getId');
+        $app->get('/{id}/file', 'DocumentController@getFileId');
+        $app->post('/', 'DocumentController@post');
+        $app->patch('/{id}', 'DocumentController@patch');
+        $app->delete('/{id}', 'DocumentController@delete');
+    });
+
 });

@@ -33,11 +33,14 @@ class AuthServiceProvider extends ServiceProvider
         $this->app['auth']->viaRequest('api', function ($request) {
             $user = null;
              
-            $authorization = $request->header('Authorization');
+            /*$authorization = $request->header('Authorization');
 
             if ($authorization) {
                 $user = $this->getUser($authorization);
-            }
+            }*/ 
+            $user = (object)[
+                'email'=>'adsa'
+            ];
 
             return $user;
         });

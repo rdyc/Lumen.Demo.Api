@@ -3,39 +3,40 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\DummyClassPatchRequest;
-use App\Http\Requests\DummyClassPostRequest;
-use App\Repositories\Contracts\IDummyClassRepository;
-use App\Transformers\DummyClassModelTransformer;
+use App\Http\Requests\DocumentPatchRequest;
+use App\Http\Requests\DocumentPostRequest;
+use App\Repositories\Contracts\IDocumentRepository;
+use App\Transformers\DocumentModelTransformer;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Input;
+use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
-class DummyClassController extends Controller
+class DocumentController extends Controller
 {
 
     /**
-     * @var \App\Repositories\Contracts\IDummyClassRepository
+     * @var \App\Repositories\Contracts\IDocumentRepository
      */
     private $repo;
 
-    public function __construct(IDummyClassRepository $repo)
+    public function __construct(IDocumentRepository $repo)
     {
         $this->repo = $repo;
     }
 
     /**
-     * @SWG\Get(path="/DummyPath",
+     * @SWG\Get(path="/document",
      *   security={
      *     {"demo_auth": {}}
      *   },
-     *   tags={"DummyClass"},
-     *   summary="Get all DummyPaths",
+     *   tags={"Document"},
+     *   summary="Get all documents",
      *   description="",
-     *   operationId="getAllDummyClass",
+     *   operationId="getAllDocument",
      *   produces={"application/json"},
      *   @SWG\Parameter(ref="#/parameters/RequestedWith"),
      *   @SWG\Parameter(ref="#/parameters/Pagination.Page"),
@@ -52,7 +53,7 @@ class DummyClassController extends Controller
      *   @SWG\Response(
      *     response=200,
      *     description="Successful operation",
-     *     @SWG\Schema(ref="#/definitions/DummyClassCollectionResponse")
+     *     @SWG\Schema(ref="#/definitions/DocumentCollectionResponse")
      *   ),
      *   @SWG\Response(response=400, ref="#/responses/BadRequest"),
      *   @SWG\Response(response=401, ref="#/responses/Unauthorized"),
@@ -71,7 +72,7 @@ class DummyClassController extends Controller
             $item = $this->repo->get($page, $limit, $order, $sort);
 
             if ($item) {
-                return $this->buildCollectionResponse($item, new DummyClassModelTransformer);
+                return $this->buildCollectionResponse($item, new DocumentModelTransformer);
             } else {
                 return response(null, Response::HTTP_NO_CONTENT);
             }
@@ -83,27 +84,27 @@ class DummyClassController extends Controller
     }
 
     /**
-     * @SWG\Get(path="/DummyPath/{id}",
+     * @SWG\Get(path="/document/{id}",
      *   security={
      *     {"demo_auth": {}}
      *   },
-     *   tags={"DummyClass"},
-     *   summary="Get single DummyPath",
+     *   tags={"Document"},
+     *   summary="Get single document",
      *   description="",
-     *   operationId="getDummyClass",
+     *   operationId="getDocument",
      *   produces={"application/json"},
      *   @SWG\Parameter(
      *     in="path",
      *     name="id",
      *     type="string",
-     *     description="DummyClass ID",
+     *     description="Document ID",
      *     required=true
      *   ),
      *   @SWG\Parameter(ref="#/parameters/RequestedWith"),
      *   @SWG\Response(
      *     response=200,
      *     description="Successful operation",
-     *     @SWG\Schema(ref="#/definitions/DummyClassItemResponse")
+     *     @SWG\Schema(ref="#/definitions/DocumentItemResponse")
      *   ),
      *   @SWG\Response(response=400, ref="#/responses/BadRequest"),
      *   @SWG\Response(response=401, ref="#/responses/Unauthorized"),
@@ -116,7 +117,7 @@ class DummyClassController extends Controller
         try {
             $item = $this->repo->find($id);
 
-            return $this->buildItemResponse($item, new DummyClassModelTransformer);
+            return $this->buildItemResponse($item, new DocumentModelTransformer);
         } catch (HttpException $e) {
             throw new HttpException($e->getStatusCode(), $e->getMessage());
         } catch (ModelNotFoundException $e) {
@@ -127,21 +128,75 @@ class DummyClassController extends Controller
     }
 
     /**
-     * @SWG\Post(path="/DummyPath",
+     * @SWG\Get(path="/document/{id}/file",
      *   security={
      *     {"demo_auth": {}}
      *   },
-     *   tags={"DummyClass"},
-     *   summary="Creating DummyPath",
+     *   tags={"Document"},
+     *   summary="Get single document file",
      *   description="",
-     *   operationId="createDummyClass",
+     *   operationId="getDocumentFile",
+     *   produces={"application/*"},
+     *   @SWG\Parameter(
+     *     in="path",
+     *     name="id",
+     *     type="string",
+     *     description="Document ID",
+     *     required=true
+     *   ),
+     *   @SWG\Parameter(ref="#/parameters/RequestedWith"),
+     *   @SWG\Response(
+     *     response=200,
+     *     description="Successful operation",
+     *     @SWG\Schema(type="file")
+     *   ),
+     *   @SWG\Response(response=400, ref="#/responses/BadRequest"),
+     *   @SWG\Response(response=401, ref="#/responses/Unauthorized"),
+     *   @SWG\Response(response=403, ref="#/responses/Forbidden"),
+     *   @SWG\Response(response=500, ref="#/responses/GeneralError")
+     * )
+     **/
+    public function getFileId($id)
+    {
+        try {
+            $model = $this->repo->find($id);
+            
+            $transformer =  $this->buildItemResponse($model, new DocumentModelTransformer);
+
+            $item = $transformer->getData()->data;
+
+            return response()->make(utf8_decode($item->content), 200, [
+                'Content-Transfer-Encoding' => 'binary',
+                'Content-Disposition' => 'attachment; filename="'. $item->name . '"',
+                'Content-Type' => $item->mime. ';charset=utf-8',
+                'Content-Length' => $item->size
+            ]);
+        } catch (HttpException $e) {
+            throw new HttpException($e->getStatusCode(), $e->getMessage());
+        } catch (ModelNotFoundException $e) {
+            throw new HttpException(Response::HTTP_NOT_FOUND, $e->getMessage());
+        } catch (\Exception $e) {
+            throw new HttpException(Response::HTTP_INTERNAL_SERVER_ERROR, $e->getMessage());
+        }
+    }
+
+    /**
+     * @SWG\Post(path="/document",
+     *   security={
+     *     {"demo_auth": {}}
+     *   },
+     *   tags={"Document"},
+     *   summary="Creating document",
+     *   description="",
+     *   operationId="createDocument",
+     *   consumes={"multipart/form-data"},
      *   produces={"application/json"},
      *   @SWG\Parameter(
-     *     in="body",
-     *     name="payload",
-     *     description="DummyClass data",
-     *     required=true,
-     *     @SWG\Schema(ref="#/definitions/DummyClassPostRequest")
+     *     in="formData",
+     *     name="document",
+     *     type="file",
+     *     description="Document file",
+     *     required=true
      *   ),
      *   @SWG\Parameter(ref="#/parameters/RequestedWith"),
      *   @SWG\Response(response=201, ref="#/responses/Created"),
@@ -154,7 +209,7 @@ class DummyClassController extends Controller
     public function post()
     {
         try {
-            $post = new DummyClassPostRequest(Input::all());
+            $post = new DocumentPostRequest(Input::class);
 
             $model = $post->parse();
 
@@ -171,28 +226,28 @@ class DummyClassController extends Controller
     }
 
     /**
-     * @SWG\Patch(path="/DummyPath/{id}",
+     * @SWG\Patch(path="/document/{id}",
      *   security={
      *     {"demo_auth": {}}
      *   },
-     *   tags={"DummyClass"},
-     *   summary="Updating DummyPath",
+     *   tags={"Document"},
+     *   summary="Updating document",
      *   description="",
-     *   operationId="updateDummyClass",
+     *   operationId="updateDocument",
      *   produces={"application/json"},
      *   @SWG\Parameter(
      *     in="path",
      *     name="id",
      *     type="string",
-     *     description="DummyClass ID",
+     *     description="Document ID",
      *     required=true
      *   ),
      *   @SWG\Parameter(
      *     in="body",
      *     name="payload",
-     *     description="DummyClass data",
+     *     description="Document data",
      *     required=true,
-     *     @SWG\Schema(ref="#/definitions/DummyClassPatchRequest")
+     *     @SWG\Schema(ref="#/definitions/DocumentPatchRequest")
      *   ),
      *   @SWG\Parameter(ref="#/parameters/RequestedWith"),
      *   @SWG\Response(response=202, ref="#/responses/Accepted"),
@@ -205,7 +260,7 @@ class DummyClassController extends Controller
     public function patch($id)
     {
         try {
-            $patch = new DummyClassPatchRequest(Input::all());
+            $patch = new DocumentPatchRequest(Input::all());
 
             $model = $patch->parse();
 
@@ -224,20 +279,20 @@ class DummyClassController extends Controller
     }
 
     /**
-     * @SWG\Delete(path="/DummyPath/{id}",
+     * @SWG\Delete(path="/document/{id}",
      *   security={
      *     {"demo_auth": {}}
      *   },
-     *   tags={"DummyClass"},
-     *   summary="Deleting DummyPath",
+     *   tags={"Document"},
+     *   summary="Deleting document",
      *   description="",
-     *   operationId="deleteDummyClass",
+     *   operationId="deleteDocument",
      *   produces={"application/json"},
      *   @SWG\Parameter(
      *     in="path",
      *     name="id",
      *     type="string",
-     *     description="DummyClass ID",
+     *     description="Document ID",
      *     required=true
      *   ),
      *   @SWG\Parameter(ref="#/parameters/RequestedWith"),
