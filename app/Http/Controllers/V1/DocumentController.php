@@ -7,11 +7,14 @@ use App\Http\Requests\DocumentPatchRequest;
 use App\Http\Requests\DocumentPostRequest;
 use App\Repositories\Contracts\IDocumentRepository;
 use App\Transformers\DocumentModelTransformer;
+use Carbon\Carbon;
+use Faker\Factory;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Validation\ValidationException;
+use PhpOffice\PhpWord\TemplateProcessor;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
@@ -165,12 +168,39 @@ class DocumentController extends Controller
 
             $item = $transformer->getData()->data;
 
-            return response()->make(utf8_decode($item->content), 200, [
+            $faker = Factory::create();
+
+            $templateProcessor = new TemplateProcessor(app('path').'/../storage/template.docx');
+            $docVars = $templateProcessor->getVariables();
+
+            $items = [
+                'Title' => $faker->company,
+                'FullName' => $faker->name,
+                'Address' => $faker->address,
+                'JobTitle' => $faker->jobTitle,
+                'Paragraph1st' => $faker->paragraph(10),
+                'Paragraph2nd' => $faker->paragraph(6),
+                'Paragraph3rd' => $faker->paragraph(),
+                'CenterText' => $faker->sentence(),
+                'RightText' => $faker->sentence()
+            ];
+
+            foreach ($items as $key => $value){
+                $templateProcessor->setValue($key, $value);
+            }
+
+            $templateProcessor->setImg('Image', array('src' => app('path').'/../storage/_mars.jpg', 'size' => array(96, 77)));
+
+            $templateProcessor->saveAs(app('path').'/../storage/tst.docx');
+
+            /*return response()->make(utf8_decode($item->content), 200, [
                 'Content-Transfer-Encoding' => 'binary',
                 'Content-Disposition' => 'attachment; filename="'. $item->name . '"',
                 'Content-Type' => $item->mime. ';charset=utf-8',
                 'Content-Length' => $item->size
-            ]);
+            ]);*/
+
+            return response($docVars);
         } catch (HttpException $e) {
             throw new HttpException($e->getStatusCode(), $e->getMessage());
         } catch (ModelNotFoundException $e) {
