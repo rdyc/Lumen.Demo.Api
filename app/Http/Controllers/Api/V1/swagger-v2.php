@@ -3,7 +3,7 @@
 /**
  * @SWG\Swagger(
  *     schemes={"http", "https"},
- *     host="localhost:8003",
+ *     host="api-rdy-dev",
  *     basePath="/v1",
  *     @SWG\Info(
  *         version="1",
@@ -23,8 +23,8 @@
  * @SWG\SecurityScheme(
  *   securityDefinition="demo_auth",
  *   type="oauth2",
- *   authorizationUrl="http://localhost:8001/oauth/authorize",
- *   tokenUrl="http://localhost:8001/oauth/token",
+ *   authorizationUrl="https://web-commtrace-dev/oauth/authorize",
+ *   tokenUrl="https://web-commtrace-dev/oauth/token",
  *   flow="implicit",
  *   scopes={
  *     "profiles-read": "Read user profiles",
