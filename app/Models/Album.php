@@ -9,7 +9,7 @@ class Album extends BaseModel
      *
      * @var string
      */
-    protected $connection = 'mysql';
+    //protected $connection = 'mysql';
 
     /**
      * The table associated with the model.
