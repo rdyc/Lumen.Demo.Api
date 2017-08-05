@@ -3,7 +3,7 @@
 /**
  * @SWG\Swagger(
  *     schemes={"http", "https"},
- *     host="api-rdy-dev",
+ *     host="api-rdy-dev.herokuapp.com",
  *     basePath="/v1",
  *     @SWG\Info(
  *         version="1",
@@ -23,8 +23,8 @@
  * @SWG\SecurityScheme(
  *   securityDefinition="demo_auth",
  *   type="oauth2",
- *   authorizationUrl="https://web-commtrace-dev/oauth/authorize",
- *   tokenUrl="https://web-commtrace-dev/oauth/token",
+ *   authorizationUrl="https://web-commtrace-dev.herokuapp.com/oauth/authorize",
+ *   tokenUrl="https://web-commtrace-dev.herokuapp.com/oauth/token",
  *   flow="implicit",
  *   scopes={
  *     "profiles-read": "Read user profiles",
