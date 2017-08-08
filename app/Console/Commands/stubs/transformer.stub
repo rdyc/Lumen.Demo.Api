@@ -1,0 +1,33 @@
+<?php
+
+namespace App\Transformers;
+
+use App\Http\Responses\DummyClassResponse;
+use App\Models\DummyClassModel;
+use Illuminate\Support\Facades\App;
+use League\Fractal\TransformerAbstract;
+
+class DummyClassModelTransformer extends TransformerAbstract
+{
+    /**
+     * List of resources possible to include
+     *
+     * @var array
+     */
+    protected $availableIncludes = [
+        //
+    ];
+
+    /**
+     * Turn this item object into a generic array
+     *
+     * @return array
+     */
+    public function transform(DummyClassModel $model)
+    {
+        $response = new DummyClassResponse($model);
+
+        return $response->serialize();
+    }
+
+}

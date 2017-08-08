@@ -13,7 +13,18 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
-        //
+        \App\Console\Commands\ApiMakeCommand::class,
+        \App\Console\Commands\RepositoryMakeCommand::class,
+        \App\Console\Commands\RepositoryContractMakeCommand::class,
+        \App\Console\Commands\RepositoryModelMakeCommand::class,
+        \App\Console\Commands\ApiControllerMakeCommand::class,
+        \App\Console\Commands\ApiPostRequestMakeCommand::class,
+        \App\Console\Commands\ApiPatchRequestMakeCommand::class,
+        \App\Console\Commands\ApiResponseMakeCommand::class,
+        \App\Console\Commands\ApiResponseCollectionMakeCommand::class,
+        \App\Console\Commands\ApiResponseItemMakeCommand::class,
+        \App\Console\Commands\ApiTransformerMakeCommand::class,
+        \App\Console\Commands\ApiTestMakeCommand::class,
     ];
 
     /**

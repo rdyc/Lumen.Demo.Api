@@ -1,0 +1,19 @@
+<?php
+
+namespace App\Repositories;
+
+use App\Models\DummyClassModel;
+use App\Repositories\GenericRepository;
+use App\Repositories\Contracts\IDummyClassRepository;
+use Illuminate\Support\Facades\App;
+
+class DummyClassRepository extends GenericRepository implements IDummyClassRepository
+{
+
+    public function __construct()
+    {
+        parent::__construct(App::make(DummyClassModel::class));
+    }
+
+    // define other methods here
+}
