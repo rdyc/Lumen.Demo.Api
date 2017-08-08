@@ -3,12 +3,12 @@
 /**
  * @SWG\Swagger(
  *     schemes={"http", "https"},
- *     host="api-rdy-dev.herokuapp.com",
+ *     host="api-commtrace-dev.herokuapp.com",
  *     basePath="/v1",
  *     @SWG\Info(
  *         version="1",
  *         title="REST Api Documentation",
- *         description="Representation State Transfer Protocol",
+ *         description="Representational State Transfer",
  *         @SWG\Contact(
  *             name="Ruddy Cahyadi",
  *             email="ruddycahyadi@gmail.com"

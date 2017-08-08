@@ -13,12 +13,13 @@ class SwaggerController extends Controller
             $http_code = Response::HTTP_OK;
             $app_path =app('path');
 
-            $controller_path = $app_path . '/Http/Controllers/Api/' . strtoupper($version);
-            $model_path = $app_path . '/Transformers';
-            
+            $controller_path = $app_path . '/Http/Controllers/' . strtoupper($version);
+            $request_path = $app_path . '/Http/Requests';
+            $response_path = $app_path . '/Http/Responses';
+
             if(file_exists($controller_path))
             {
-                $result = \Swagger\scan([$controller_path, $model_path ]);
+                $result = \Swagger\scan([$controller_path, $request_path, $response_path]);
             }else{
                 $result = 'Api '. strtoupper($version) .' does not exist';
                 $http_code = Response::HTTP_BAD_REQUEST;

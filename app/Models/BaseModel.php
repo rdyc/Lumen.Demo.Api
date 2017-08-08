@@ -9,6 +9,20 @@ abstract class BaseModel extends Model
 {
 
     /**
+     * The connection name for the model
+     *
+     * @var string
+     */
+    //protected $connection = 'pgsql';
+
+    /**
+     * The primary key for the model.
+     *
+     * @var string
+     */
+    protected $primaryKey = 'id';
+
+    /**
      * Indicates if the model should be timestamped.
      *
      * @var bool
@@ -22,8 +36,7 @@ abstract class BaseModel extends Model
      */
     protected $dates = [
         'created_at',
-        'updated_at',
-        'deleted_at'
+        'updated_at'
     ];
 
     /** Default sort direction
@@ -54,7 +67,7 @@ abstract class BaseModel extends Model
      * @var array
      */
     protected $hidden = [
-        'deleted_at'
+        //'deleted_at'
     ];
 
     public function getSortDirection()
