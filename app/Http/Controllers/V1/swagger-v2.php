@@ -3,7 +3,7 @@
 /**
  * @SWG\Swagger(
  *     schemes={"http", "https"},
- *     host="localhost:8003",
+ *     host="api-commtrace-dev.herokuapp.com",
  *     basePath="/v1",
  *     @SWG\Info(
  *         version="1",
