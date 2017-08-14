@@ -70,7 +70,7 @@ class Handler extends ExceptionHandler
                 'http_code' => $http_code,
                 'status_text' => $status_text,
                 'message' => $e->getMessage(),
-                'file' => $e->getFile(). ':'. $e->getLine()
+                'trace' => $e->getTrace()
             ];
 
             // returned as json

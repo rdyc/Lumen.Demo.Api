@@ -28,8 +28,9 @@ $app->group([
 
     $app->group(['prefix' => 'sync'], function () use ($app) {
         $app->get('/', 'SyncController@get');
-        $app->get('/latest', 'SyncController@getLatest');
-        $app->get('/{version}/files', 'SyncController@getId');
-        $app->post('/', 'SyncController@post');
+        $app->post('/latest', 'SyncController@latest');
+        $app->post('/pull', 'SyncController@pull');
+        $app->post('/push', 'SyncController@push');
+        $app->post('/track', 'SyncController@track');
     });
 });

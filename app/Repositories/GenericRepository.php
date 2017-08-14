@@ -6,6 +6,10 @@ use App\Repositories\Contracts\IGenericRepository;
 
 abstract class GenericRepository implements IGenericRepository
 {
+
+    /**
+     * @var \Illuminate\Database\Eloquent\Model
+     */
     protected $model;
 
     public function __construct($model)

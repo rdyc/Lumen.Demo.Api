@@ -2,21 +2,21 @@
 
 namespace App\Models;
 
-class SyncModel extends BaseModel
+class SyncClientModel extends BaseModel
 {
     /**
      * The table associated with the model.
      *
      * @var string
      */
-    protected $table = 'sync';
+    protected $table = 'sync_client';
 
     /**
      * The primary key for the model.
      *
      * @var string
      */
-    protected $primaryKey = 'sync_id';
+    protected $primaryKey = 'sync_client_id';
 
     /**
      * The attributes that are mass assignable.
@@ -24,10 +24,8 @@ class SyncModel extends BaseModel
      * @var array
      */
     protected $fillable = [
-        'sync_version',
-        'sync_client',
-        'sync_size',
-        'sync_path',
+        'sync_client_identifier',
+        'sync_client_version',
         'created_by',
         'updated_by'
     ];
@@ -38,22 +36,13 @@ class SyncModel extends BaseModel
      * @var array
      */
     protected $casts = [
-        'sync_size' => 'integer'
-    ];
-
-    /**
-     * The attributes excluded from the model's JSON form.
-     *
-     * @var array
-     */
-    protected $hidden = [
-        'sync_path',
+        //'sync_size' => 'integer'
     ];
 
     /** 
      * Override default sort direction
      *  @var string
      */
-    protected $defaultSort = 'desc';
+    protected $defaultSort = 'asc';
     
 }

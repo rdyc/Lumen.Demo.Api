@@ -23,13 +23,7 @@ class SyncResponse extends BaseLog
      * @SWG\Property
      * @var string
      */
-    public $source;
-
-    /**
-     * @SWG\Property
-     * @var string
-     */
-    public $path;
+    public $client;
 
     /**
      * @SWG\Property
@@ -39,11 +33,10 @@ class SyncResponse extends BaseLog
 
     public function __construct($model)
     {
-        $this->id = $model->id;
-        $this->version = $model->version;
-        $this->source = $model->source;
-        $this->path = $model->path;
-        $this->size = $model->size;
+        $this->id = $model->sync_id;
+        $this->version = $model->sync_version;
+        $this->client = $model->sync_client;
+        $this->size = $model->sync_size;
         $this->createdBy = $model->created_by;
         $this->createdAt = $model->created_at;
         $this->updatedBy = $model->updated_by;

@@ -6,7 +6,7 @@ use App\Http\Responses\SyncResponse;
 use App\Models\SyncModel;
 use League\Fractal\TransformerAbstract;
 
-class SyncModelTransformer extends TransformerAbstract
+class SyncClientModelTransformer extends TransformerAbstract
 {
     /**
      * List of resources possible to include

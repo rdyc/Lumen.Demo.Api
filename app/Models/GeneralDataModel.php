@@ -2,21 +2,29 @@
 
 namespace App\Models;
 
-class SyncModel extends BaseModel
+class GeneralDataModel extends BaseSyncModel
 {
+
     /**
      * The table associated with the model.
      *
      * @var string
      */
-    protected $table = 'sync';
+    protected $table = 'tm_general_data';
 
     /**
      * The primary key for the model.
      *
      * @var string
      */
-    protected $primaryKey = 'sync_id';
+    protected $primaryKey = 'general_data_id';
+
+    /**
+     * Indicates if the IDs are auto-incrementing.
+     *
+     * @var bool
+     */
+    public $incrementing = true;
 
     /**
      * The attributes that are mass assignable.
@@ -24,12 +32,17 @@ class SyncModel extends BaseModel
      * @var array
      */
     protected $fillable = [
-        'sync_version',
-        'sync_client',
-        'sync_size',
-        'sync_path',
+        'general_code', 
+        'description_code',
+        'description',
+        'initial_code',
+        'color',
+        'general_id',
+        'sorting',
+        'fl_status',
         'created_by',
-        'updated_by'
+        'updated_by',
+        'deleted_by'
     ];
 
     /**
@@ -38,7 +51,9 @@ class SyncModel extends BaseModel
      * @var array
      */
     protected $casts = [
-        'sync_size' => 'integer'
+        'general_data_id' => 'integer',
+        'sorting' => 'integer',
+        'fl_status' => 'boolean',
     ];
 
     /**
@@ -47,13 +62,14 @@ class SyncModel extends BaseModel
      * @var array
      */
     protected $hidden = [
-        'sync_path',
+        'deleted_by',
+        'deleted_at',
     ];
 
     /** 
      * Override default sort direction
      *  @var string
      */
-    protected $defaultSort = 'desc';
+    protected $defaultSort = 'asc';
     
 }

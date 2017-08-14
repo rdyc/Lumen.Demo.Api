@@ -34,11 +34,13 @@ class AuthServiceProvider extends ServiceProvider
         $this->app['auth']->viaRequest('api', function ($request) {
             $user = null;
 
-            $authorization = $request->header('Authorization');
+            /*$authorization = $request->header('Authorization');
 
             if ($authorization) {
                 $user = $this->getUser($authorization);
-            }
+            }*/
+
+            $user = ['name'=>'Rambo','email'=>'john.rambo@delta.us'];
 
             return $user;
         });
@@ -54,6 +56,7 @@ class AuthServiceProvider extends ServiceProvider
     {
         try{
             $http = new Client([
+                'connection_timeout' => 0.5,
                 'base_uri' => config('oauth.baseUri'),
                 'headers' => [
                     'Authorization' => $authorization,

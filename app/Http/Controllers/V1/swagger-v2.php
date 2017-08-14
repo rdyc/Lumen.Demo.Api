@@ -3,7 +3,7 @@
 /**
  * @SWG\Swagger(
  *     schemes={"http", "https"},
- *     host="api-commtrace-dev.herokuapp.com",
+ *     host="localhost:8003",
  *     basePath="/v1",
  *     @SWG\Info(
  *         version="1",
@@ -62,7 +62,7 @@
  *     required=false,
  *     default=10
  * )
- * 
+ *
  * @SWG\Parameter(
  *     parameter="Sorting",
  *     in="query",
