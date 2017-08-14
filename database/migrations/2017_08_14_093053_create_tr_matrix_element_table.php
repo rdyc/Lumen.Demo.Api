@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateSyncTable extends Migration
+class CreateTrMatrixElementTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,15 +13,16 @@ class CreateSyncTable extends Migration
      */
     public function up()
     {
-        Schema::create('sync', function (Blueprint $table) {
-            $table->increments('sync_id');
-            $table->string('sync_version');
-            $table->string('sync_client');
-            $table->integer('sync_size');
-            $table->string('sync_path');
+        Schema::create('tr_matrix_element', function (Blueprint $table) {
+            $table->increments('matrix_element_id');
+            $table->integer('element_id');
+            $table->string('kategori', 225);
+            $table->boolean('fl_status');
             $table->string('created_by');
             $table->string('updated_by');
+            $table->string('deleted_by')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
@@ -32,6 +33,6 @@ class CreateSyncTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('sync');
+        Schema::dropIfExists('tr_matrix_element');
     }
 }

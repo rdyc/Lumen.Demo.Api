@@ -3,4 +3,5 @@
 Homestead.json
 Homestead.yaml
 .env
+/app/Http/Controllers/V1/swagger-v2.php
 /storage/oauth-public.key

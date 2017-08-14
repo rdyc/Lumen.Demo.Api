@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Models\BaseSyncModel;
-use App\Repositories\Contracts\IMasterGeneralRepository;
 use App\Repositories\Contracts\ISyncClientRepository;
 use App\Repositories\Contracts\ISyncRepository;
 use App\Services\Contracts\ISyncService;
@@ -12,14 +11,13 @@ use Carbon\Carbon;
 class SyncService implements ISyncService
 {
     protected $syncRepo;
-    protected $syncClientRepo;
-    protected $masterGeneralRepository;
 
-    function __construct(ISyncRepository $syncRepository, ISyncClientRepository $syncClientRepository, IMasterGeneralRepository $masterGeneralRepository)
+    protected $syncClientRepo;
+
+    function __construct(ISyncRepository $syncRepository, ISyncClientRepository $syncClientRepository)
     {
         $this->syncRepo = $syncRepository;
         $this->syncClientRepo = $syncClientRepository;
-        $this->masterGeneralRepository = $masterGeneralRepository;
     }
 
     public function get($page, $limit, $order, $sort)
@@ -96,6 +94,12 @@ class SyncService implements ISyncService
         $carbon = Carbon::parse($carbon);
 
         $schemas = null;
+
+        // load classes
+        $cls1 = new \App\Models\GeneralDataModel();
+        $cls2 = new \App\Models\ElementFormModel();
+        $cls3 = new \App\Models\ElementItemModel();
+        $cls4 = new \App\Models\MatrixElementModel();
 
         // get all sync classes
         foreach (get_declared_classes() as $class) {

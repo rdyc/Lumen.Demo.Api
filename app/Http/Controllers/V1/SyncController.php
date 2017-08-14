@@ -3,16 +3,10 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\SyncPatchRequest;
 use App\Http\Requests\SyncPostRequest;
 use App\Http\Requests\SyncRequest;
-use App\Models\SyncClientModel;
-use App\Repositories\Contracts\ISyncClientRepository;
-use App\Repositories\Contracts\ISyncRepository;
 use App\Services\Contracts\ISyncService;
 use App\Transformers\SyncModelTransformer;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Validation\ValidationException;
@@ -178,9 +172,9 @@ class SyncController extends Controller
             $sync = $this->service->findChanges($payload->version, $user);
             //print_r($sync);exit;
 
-            if($sync){
+            if ($sync) {
                 return response()->json($sync);
-            }else{
+            } else {
                 return response(null, Response::HTTP_NO_CONTENT);
             }
         } catch (ValidationException $e) {
