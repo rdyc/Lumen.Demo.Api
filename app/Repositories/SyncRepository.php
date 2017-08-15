@@ -2,8 +2,6 @@
 
 namespace App\Repositories;
 
-use App\Models\SyncClientModel;
-use App\Models\SyncFileModel;
 use App\Models\SyncModel;
 use App\Repositories\Contracts\ISyncRepository;
 use Carbon\Carbon;

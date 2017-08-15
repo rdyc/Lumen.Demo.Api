@@ -92,11 +92,13 @@ class DatabaseSeeder extends Seeder
                         'child' => [
                             [3, 2, 'Nama Pemasok', 'Text', NULL, 'T', 10, 3, NULL, NULL, NULL, NULL, NULL, NULL, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, TRUE, FALSE, FALSE, FALSE, FALSE,
                                 'child' => null,
-                                'matrix' => ['PEMSOK_GG', 'PENGEPUL_PERUSAHAAN', 'PERUSAHAAN', 'PENGEPUL_KOPERASI', 'PETANI_KECIL']
+                                'matrix' => ['PEMSOK_GG', 'PENGEPUL_PERUSAHAAN', 'PERUSAHAAN', 'PENGEPUL_KOPERASI', 'PETANI_KECIL'],
+                                'validation' => [NULL, NULL, NULL, NULL, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, TRUE, FALSE]
                             ],
                             [4, 2, 'Nomor KTP/SIM', 'Text', NULL, 'S', 10, 4, NULL, NULL, NULL, NULL, NULL, NULL, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, FALSE, FALSE, FALSE, TRUE, TRUE, FALSE, FALSE, FALSE, FALSE,
                                 'child' => null,
-                                'matrix' => ['PEMSOK_GG', 'PENGEPUL_PERUSAHAAN', 'PERUSAHAAN', 'PENGEPUL_KOPERASI', 'PETANI_KECIL']
+                                'matrix' => ['PEMSOK_GG', 'PENGEPUL_PERUSAHAAN', 'PERUSAHAAN', 'PENGEPUL_KOPERASI', 'PETANI_KECIL'],
+                                'validation' => [16, NULL, NULL, NULL, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, TRUE, FALSE]
                             ],
                             [5, 2, 'Nomor Telepon', 'Text', NULL, 'T', 10, 5, NULL, NULL, NULL, NULL, NULL, NULL, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, TRUE, FALSE, FALSE, FALSE, FALSE,
                                 'child' => null,
@@ -116,7 +118,8 @@ class DatabaseSeeder extends Seeder
                             ],
                             [87, 2, 'Kode Pemasok', 'Text', NULL, NULL, NULL, 2, NULL, NULL, NULL, NULL, NULL, NULL, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, TRUE, FALSE, FALSE, FALSE, FALSE,
                                 'child' => null,
-                                'matrix' => ['PEMASOK_BARU', 'PEMSOK_GG', 'PENGEPUL_PERUSAHAAN', 'PERUSAHAAN', 'PENGEPUL_KOPERASI', 'PETANI_KECIL']
+                                'matrix' => ['PEMASOK_BARU', 'PEMSOK_GG', 'PENGEPUL_PERUSAHAAN', 'PERUSAHAAN', 'PENGEPUL_KOPERASI', 'PETANI_KECIL'],
+                                'validation' => [NULL, NULL, NULL, NULL, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, FALSE]
                             ],
                             [88, 2, 'Status', 'Select', NULL, NULL, NULL, 10, NULL, NULL, NULL, NULL, NULL, NULL, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, TRUE, FALSE, FALSE, FALSE, FALSE,
                                 'child' => null,
@@ -128,11 +131,13 @@ class DatabaseSeeder extends Seeder
                             ],
                             [89, 2, 'Kategori Pemasok', 'Text', NULL, NULL, NULL, 1, NULL, NULL, NULL, NULL, NULL, NULL, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, TRUE, FALSE, FALSE, FALSE, FALSE,
                                 'child' => null,
-                                'matrix' => ['PENGEPUL_PERUSAHAAN', 'PERUSAHAAN', 'PENGEPUL_KOPERASI', 'PETANI_KECIL', 'PEMASOK_BARU']
+                                'matrix' => ['PENGEPUL_PERUSAHAAN', 'PERUSAHAAN', 'PENGEPUL_KOPERASI', 'PETANI_KECIL', 'PEMASOK_BARU'],
+                                'validation' => [NULL, NULL, NULL, NULL, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, FALSE]
                             ],
                             [90, 2, 'Ref Kode Pemasok', 'Text', NULL, NULL, NULL, 2, NULL, NULL, NULL, NULL, NULL, NULL, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, TRUE, TRUE, FALSE, FALSE, FALSE, FALSE,
                                 'child' => null,
-                                'matrix' => ['PENGEPUL_PERUSAHAAN', 'PERUSAHAAN', 'PENGEPUL_KOPERASI', 'PETANI_KECIL', 'PEMASOK_BARU', 'PEMSOK_GG']
+                                'matrix' => ['PENGEPUL_PERUSAHAAN', 'PERUSAHAAN', 'PENGEPUL_KOPERASI', 'PETANI_KECIL', 'PEMASOK_BARU', 'PEMSOK_GG'],
+                                'validation' => [NULL, NULL, NULL, NULL, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, FALSE]
                             ],
                             [91, 2, 'Email', 'Checkbox', NULL, NULL, NULL, 12, NULL, NULL, NULL, NULL, NULL, NULL, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE,
                                 'child' => null,
@@ -160,7 +165,8 @@ class DatabaseSeeder extends Seeder
                             ],
                             [95, 2, 'Contoh aja', 'Text', NULL, NULL, NULL, 13, NULL, NULL, NULL, NULL, NULL, NULL, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, TRUE, FALSE, FALSE, FALSE, FALSE,
                                 'child' => null,
-                                'matrix' => ['PEMASOK_BARU']
+                                'matrix' => ['PEMASOK_BARU'],
+                                'validation' => [NULL, NULL, NULL, NULL, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, TRUE, FALSE]
                             ],
                             [96, 2, 'Jenis Kelamin', 'Radio', NULL, NULL, NULL, 14, NULL, NULL, NULL, NULL, NULL, NULL, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE,
                                 'child' => null,
@@ -180,7 +186,8 @@ class DatabaseSeeder extends Seeder
                             ],
                             [98, 2, 'Jenis Revi', 'Radio', NULL, NULL, NULL, 15, NULL, NULL, NULL, NULL, NULL, NULL, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, TRUE, FALSE, FALSE, FALSE, FALSE,
                                 'child' => null,
-                                'matrix' => ['PENGEPUL_KOPERASI']
+                                'matrix' => ['PENGEPUL_KOPERASI'],
+                                'validation' => [NULL, NULL, NULL, NULL, TRUE, FALSE, FALSE, FALSE, FALSE, TRUE, TRUE, FALSE]
                             ],
                             [99, 2, 'Jenis', 'Radio', NULL, NULL, NULL, 0, NULL, NULL, NULL, NULL, NULL, NULL, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE,
                                 'child' => null,
@@ -188,7 +195,8 @@ class DatabaseSeeder extends Seeder
                             ],
                             [100, 2, 'Test Validasi', 'Text', NULL, NULL, NULL, 4, NULL, NULL, NULL, NULL, NULL, NULL, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, TRUE, FALSE, FALSE, FALSE, FALSE,
                                 'child' => null,
-                                'matrix' => ['PEMASOK_BARU']
+                                'matrix' => ['PEMASOK_BARU'],
+                                'validation' => [NULL, 2, NULL, NULL, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, TRUE, FALSE]
                             ],
                             [142, 2, 'Kode Parent Company', 'Text', NULL, NULL, 10, 13, NULL, NULL, NULL, NULL, '/ffb/popup/parentCompany', NULL, TRUE, FALSE, FALSE, FALSE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, TRUE, FALSE, FALSE, FALSE, FALSE,
                                 'child' => null,
@@ -205,7 +213,8 @@ class DatabaseSeeder extends Seeder
                         'child' => [
                             [7, 17, 'No Rekening', 'Text', NULL, 'T', 10, 1, NULL, NULL, NULL, NULL, NULL, NULL, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, TRUE, FALSE, FALSE, FALSE, FALSE,
                                 'child' => null,
-                                'matrix' => ['PENGEPUL_KOPERASI', 'PETANI_KECIL', 'PENGEPUL_PERUSAHAAN', 'PERUSAHAAN', 'PEMSOK_GG']
+                                'matrix' => ['PENGEPUL_KOPERASI', 'PETANI_KECIL', 'PENGEPUL_PERUSAHAAN', 'PERUSAHAAN', 'PEMSOK_GG'],
+                                'validation' => [8, 10, NULL, NULL, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, TRUE, FALSE]
                             ],
                             [8, 17, 'Bank', 'Text', NULL, 'T', 10, 2, NULL, NULL, NULL, NULL, NULL, NULL, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, TRUE, FALSE, FALSE, FALSE, FALSE,
                                 'child' => null,
@@ -259,11 +268,13 @@ class DatabaseSeeder extends Seeder
                             ],
                             [85, 62, 'NIK', 'Text', NULL, 'T', NULL, 4, NULL, NULL, NULL, 'NIK', NULL, NULL, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, TRUE, FALSE, FALSE, FALSE, FALSE,
                                 'child' => null,
-                                'matrix' => ['PENGEPUL_PERUSAHAAN', 'PERUSAHAAN', 'PENGEPUL_KOPERASI', 'PETANI_KECIL']
+                                'matrix' => ['PENGEPUL_PERUSAHAAN', 'PERUSAHAAN', 'PENGEPUL_KOPERASI', 'PETANI_KECIL'],
+                                'validation' => [NULL, NULL, NULL, NULL, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, FALSE]
                             ],
                             [86, 62, 'Nama Marketing', 'Text', NULL, 'T', NULL, 5, NULL, NULL, NULL, 'NAMA', NULL, NULL, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, TRUE, FALSE, FALSE, FALSE, FALSE,
                                 'child' => null,
-                                'matrix' => ['PENGEPUL_PERUSAHAAN', 'PERUSAHAAN', 'PENGEPUL_KOPERASI', 'PETANI_KECIL']
+                                'matrix' => ['PENGEPUL_PERUSAHAAN', 'PERUSAHAAN', 'PENGEPUL_KOPERASI', 'PETANI_KECIL'],
+                                'validation' => [NULL, NULL, NULL, NULL, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, FALSE]
                             ],
                         ],
                         'matrix' => ['PETANI_KECIL', 'PENGEPUL_KOPERASI', 'PENGEPUL_PERUSAHAAN', 'PERUSAHAAN']
@@ -353,6 +364,7 @@ class DatabaseSeeder extends Seeder
         $attributes = $elements;
         unset($attributes['child']); //print_r($elements['matrix']);exit;
         unset($attributes['matrix']); //print_r($elements['matrix']);exit;
+        unset($attributes['validation']); //print_r($elements['matrix']);exit;
         unset($attributes['item']); //print_r($elements['matrix']);exit;
 
         $id = $this->insertElementForm($attributes);
@@ -367,12 +379,21 @@ class DatabaseSeeder extends Seeder
         }
 
         // items
-        if(is_array($elements['item'])) {
+        if (is_array($elements['item'])) {
             foreach ($elements['item'] as $item) {
                 $items = $this->parseElementItem($item, $user, $date);
                 $items['element_id'] = $id;
                 $this->insertElementItem($items);
             }
+        }
+
+        // validations
+        if (is_array($elements['validation'])) {
+            //foreach ($elements['validation'] as $item) {
+                $item = $this->parseElementValidation($elements['validation'], $user, $date);
+                $item['element_id'] = $id;
+                $this->insertElementValidation($item);
+            //}
         }
 
         // childs
@@ -418,6 +439,7 @@ class DatabaseSeeder extends Seeder
             'fl_data_api' => $array[29],
             'child' => $array['child'],
             'matrix' => $array['matrix'],
+            'validation' => array_key_exists('validation', $array) ? $array['validation'] : null,
             'item' => array_key_exists('item', $array) ? $array['item'] : null,
             'created_by' => $user,
             'updated_by' => $user,
@@ -430,7 +452,7 @@ class DatabaseSeeder extends Seeder
 
     private function insertElementForm($attributes)
     {
-        return DB::table('tm_element_form')->insertGetId($attributes);
+        return DB::table('tm_element_form')->insertGetId($attributes, 'element_id');
     }
 
     private function parseElementItem($array, $user, $date)
@@ -451,7 +473,36 @@ class DatabaseSeeder extends Seeder
 
     private function insertElementItem($attributes)
     {
-        return DB::table('tm_element_item')->insertGetId($attributes);
+        return DB::table('tm_element_item')->insertGetId($attributes, 'element_item_id');
+    }
+
+    private function parseElementValidation($array, $user, $date)
+    {
+        return [
+            'element_id' => null,
+            'min_length' => $array[0],
+            'max_length' => $array[1],
+            'script_server' => $array[2],
+            'script_client' => $array[3],
+            'fl_readonly' => $array[4],
+            'fl_display_month' => $array[5],
+            'fl_display_year' => $array[6],
+            'fl_related_validasi' => $array[7],
+            'fl_reusable' => $array[8],
+            'fl_require' => $array[9],
+            'fl_status' => true,
+            'created_by' => $user,
+            'updated_by' => $user,
+            'deleted_by' => null,
+            'created_at' => $date,
+            'updated_at' => $date,
+            'deleted_at' => null,
+        ];
+    }
+
+    private function insertElementValidation($attributes)
+    {
+        return DB::table('tr_rules_validasi')->insertGetId($attributes, 'rules_validasi_id');
     }
 
     private function parseMatrixElement($array, $user, $date)
@@ -471,6 +522,6 @@ class DatabaseSeeder extends Seeder
 
     private function insertElementMatrix($attributes)
     {
-        return DB::table('tr_matrix_element')->insertGetId($attributes);
+        return DB::table('tr_matrix_element')->insertGetId($attributes, 'matrix_element_id');
     }
 }

@@ -5,8 +5,10 @@ namespace App\Services;
 use App\Models\BaseSyncModel;
 use App\Repositories\Contracts\ISyncClientRepository;
 use App\Repositories\Contracts\ISyncRepository;
+use App\Repositories\Contracts\ISyncStorageRepository;
 use App\Services\Contracts\ISyncService;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\App;
 
 class SyncService implements ISyncService
 {
@@ -14,10 +16,13 @@ class SyncService implements ISyncService
 
     protected $syncClientRepo;
 
-    function __construct(ISyncRepository $syncRepository, ISyncClientRepository $syncClientRepository)
+    protected $syncStorageRepo;
+
+    function __construct(ISyncRepository $syncRepository, ISyncClientRepository $syncClientRepository, ISyncStorageRepository $syncStorageRepository)
     {
         $this->syncRepo = $syncRepository;
         $this->syncClientRepo = $syncClientRepository;
+        $this->syncStorageRepo = $syncStorageRepository;
     }
 
     public function get($page, $limit, $order, $sort)
@@ -57,7 +62,7 @@ class SyncService implements ISyncService
         //print_r($version_new);exit;
 
         // prepare data changes
-        $path = $this->prepareData($version, $now);
+        $path = $this->prepareData($version, $now, $user);
 
         if ($path) {
             $sync = [
@@ -89,17 +94,18 @@ class SyncService implements ISyncService
         return $version_new;
     }
 
-    private function prepareData($version, $carbon)
+    private function prepareData($version, $carbon, $user)
     {
         $carbon = Carbon::parse($carbon);
 
         $schemas = null;
 
         // load classes
-        $cls1 = new \App\Models\GeneralDataModel();
-        $cls2 = new \App\Models\ElementFormModel();
-        $cls3 = new \App\Models\ElementItemModel();
-        $cls4 = new \App\Models\MatrixElementModel();
+        App::make(\App\Models\GeneralDataModel::class);
+        App::make(\App\Models\ElementFormModel::class);
+        App::make(\App\Models\ElementItemModel::class);
+        App::make(\App\Models\ValidationRuleModel::class);
+        App::make(\App\Models\MatrixElementModel::class);
 
         // get all sync classes
         foreach (get_declared_classes() as $class) {
@@ -134,17 +140,14 @@ class SyncService implements ISyncService
                 ]
             ];
 
+            // encode as json
             $json = json_encode($result);
-            $ver = explode('-', $version);
-            $path = storage_path('sync/pull/' . $ver[0] . '/' . $ver[1] . '.json');
 
-            // create dir if not exists
-            if (!file_exists(storage_path('sync/pull/' . $ver[0]))) {
-                mkdir(storage_path('sync/pull/' . $ver[0]), 0700);
-            }
+            // store json in local storage
+            $path = $this->saveIntoFileStorage($version, $json);
 
-            // store as jso files
-            file_put_contents($path, $json);
+            // store json in db for backup purpose
+            $this->saveIntoDbStorage($version, filesize($path), $json, $user);
 
             return $path;
         } else {
@@ -165,7 +168,24 @@ class SyncService implements ISyncService
             $jsonArray = [];
 
             foreach ($changes as $item){
-                $json = json_decode(file_get_contents($item['sync_path']));
+                // restore from db if local json file was deleted
+                if(!file_exists($item['sync_path'])){
+                    $storage = $this->syncStorageRepo->getByVersion($item['sync_version']);
+
+                    $this->saveIntoFileStorage($item['sync_version'], $storage->sync_storage_content);
+                }
+
+                // get local file
+                $content = file_get_contents($item['sync_path']);
+
+                if(!$content){
+                    throw new \Exception('Unable to get synchronization data for version '. $item['sync_version']);
+                }
+
+                // decode into json
+                $json = json_decode($content);
+
+                // push data into array
                 $jsonArray[] = $json->data;
             }
 
@@ -180,5 +200,31 @@ class SyncService implements ISyncService
         }
 
         return $result;
+    }
+
+    private function saveIntoFileStorage($version, $content){
+        $ver = explode('-', $version);
+        $path = storage_path('sync/pull/' . $ver[0] . '/' . $ver[1] . '.json');
+
+        // create dir if not exists
+        if (!file_exists(storage_path('sync/pull/' . $ver[0]))) {
+            mkdir(storage_path('sync/pull/' . $ver[0]), 0700);
+        }
+
+        // store json in "~/storage/sync/pull/yymmdd/xxxx.json"
+        file_put_contents($path, $content);
+
+        return $path;
+    }
+
+    private function saveIntoDbStorage($version, $size, $content, $user)
+    {
+        $this->syncStorageRepo->create([
+           'sync_storage_version' => $version,
+           'sync_storage_size' => $size,
+           'sync_storage_content' => $content,
+           'created_by' => $user->email,
+           'updated_by' => $user->email,
+        ]);
     }
 }
