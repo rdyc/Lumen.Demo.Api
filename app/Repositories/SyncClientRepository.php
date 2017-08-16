@@ -16,18 +16,24 @@ class SyncClientRepository extends GenericRepository implements ISyncClientRepos
 
     public function storeLog($attributes, $user)
     {
-        $client = $this->model->where('sync_client_identifier', $attributes['sync_client_identifier'])->first();
+        $client = $this->model->where('sync_client_identifier', $attributes->client)->first();
 
         if ($client) {
-            $client->update([
-                'sync_client_version' => $attributes['sync_client_version'],
+            $sync = [
+                'sync_client_version' => $attributes->version,
                 'updated_by' => $user->email
-            ]);
-        } else {
-            $attributes['created_by'] = $user->email;
-            $attributes['updated_by'] = $user->email;
+            ];
 
-            $client = $this->model->create($attributes);
+            $client->update($sync);
+        } else {
+            $sync = [
+                'sync_client_identifier' => $attributes->client,
+                'sync_client_version' => $attributes->version,
+                'created_by' => $user->email,
+                'updated_by' => $user->email
+            ];
+
+            $client = $this->model->create($sync);
         }
 
         return $client;

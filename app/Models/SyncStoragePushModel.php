@@ -2,14 +2,14 @@
 
 namespace App\Models;
 
-class SyncStorageModel extends BaseModel
+class SyncStoragePushModel extends BaseModel
 {
     /**
      * The table associated with the model.
      *
      * @var string
      */
-    protected $table = 'sync_storage';
+    protected $table = 'sync_storage_push';
 
     /**
      * The primary key for the model.

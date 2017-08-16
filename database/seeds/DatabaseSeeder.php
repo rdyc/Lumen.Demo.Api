@@ -15,12 +15,22 @@ class DatabaseSeeder extends Seeder
         $user = 'system';
         $date = Carbon::now()->toDateTimeString();
 
+        echo "\n";
+        echo "Starting data import...\n";
+
         $this->seedGeneral($user, $date);
         $this->seedElementForm($user, $date);
+
+        echo "\n";
+        echo "Import data complete";
     }
 
     private function seedGeneral($user, $date)
     {
+        echo "\n";
+        echo "-----------------------\n";
+        echo "General Data in progress\n";
+
         $array = [
             ['BG_ICON_COM_1', 'BG_ICON_COM_1', 'icon perusahaan ke 1', 1, NULL, NULL, TRUE],
             ['BG_ICON_COM_2', 'BG_ICON_COM_2', 'icon perusahaan ke 2', 2, NULL, NULL, TRUE],
@@ -63,6 +73,8 @@ class DatabaseSeeder extends Seeder
         ];
 
         foreach ($array as $item) {
+            echo "importing: ". $item[1]."\n";
+
             $general = [
                 'general_code' => $item[0],
                 'description_code' => $item[1],
@@ -81,10 +93,17 @@ class DatabaseSeeder extends Seeder
 
             DB::table('tm_general_data')->insert($general);
         }
+
+        echo "-----------------------\n";
+        echo "General Data completed\n";
     }
 
     private function seedElementForm($user, $date)
     {
+        echo "\n";
+        echo "-----------------------\n";
+        echo "Elements in progress\n";
+
         $array = [
             [1, NULL, 'Data Pemasok', NULL, NULL, 'H', NULL, 1, 1, NULL, NULL, NULL, NULL, NULL, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, FALSE, FALSE, FALSE, FALSE,
                 'child' => [
@@ -355,6 +374,9 @@ class DatabaseSeeder extends Seeder
         foreach ($array as $item) {
             $this->readElementForm($item, $user, $date);
         }
+
+        echo "-----------------------\n";
+        echo "Elements completed\n";
     }
 
     private function readElementForm($array, $user, $date)
@@ -369,7 +391,7 @@ class DatabaseSeeder extends Seeder
 
         $id = $this->insertElementForm($attributes);
 
-        echo $elements['field_name'] . '|';
+        echo "importing: ". $elements['field_name'] ."\n";
 
         // matrix
         foreach ($elements['matrix'] as $matrix) {

@@ -24,7 +24,9 @@ class AppServiceProvider extends ServiceProvider
     private function register_repositories(){
         $this->app->bind(\App\Repositories\Contracts\IMasterGeneralRepository::class, \App\Repositories\MasterGeneralRepository::class, true);
         $this->app->bind(\App\Repositories\Contracts\ISyncRepository::class, \App\Repositories\SyncRepository::class, true);
+        $this->app->bind(\App\Repositories\Contracts\ISyncPushRepository::class, \App\Repositories\SyncPushRepository::class, true);
         $this->app->bind(\App\Repositories\Contracts\ISyncClientRepository::class, \App\Repositories\SyncClientRepository::class, true);
-        $this->app->bind(\App\Repositories\Contracts\ISyncStorageRepository::class, \App\Repositories\SyncStorageRepository::class, true);
+        $this->app->bind(\App\Repositories\Contracts\ISyncStoragePullRepository::class, \App\Repositories\SyncStoragePullRepository::class, true);
+        $this->app->bind(\App\Repositories\Contracts\ISyncStoragePushRepository::class, \App\Repositories\SyncStoragePushRepository::class, true);
     }
 }

@@ -6,9 +6,9 @@ use Illuminate\Validation\ValidationException;
 use Validator;
 
 /**
- * @SWG\Definition(@SWG\Xml(name="SyncRequest"))
+ * @SWG\Definition(@SWG\Xml(name="SyncPullRequest"))
  */
-class SyncRequest extends Sync
+class SyncPullRequest extends Sync
 {
     protected $validator;
 

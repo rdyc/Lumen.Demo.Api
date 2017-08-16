@@ -40,6 +40,8 @@ $app->withEloquent();
 $app->configure('oauth');
 $app->configure('cors');
 $app->configure('database');
+$app->configure('sync');
+$app->configure('queue');
 
 /*
 |--------------------------------------------------------------------------

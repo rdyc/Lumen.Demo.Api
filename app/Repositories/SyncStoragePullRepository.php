@@ -2,16 +2,16 @@
 
 namespace App\Repositories;
 
-use App\Models\SyncStorageModel;
-use App\Repositories\Contracts\ISyncStorageRepository;
+use App\Models\SyncStoragePullModel;
+use App\Repositories\Contracts\ISyncStoragePullRepository;
 use Illuminate\Support\Facades\App;
 
-class SyncStorageRepository extends GenericRepository implements ISyncStorageRepository
+class SyncStoragePullRepository extends GenericRepository implements ISyncStoragePullRepository
 {
 
     public function __construct()
     {
-        parent::__construct(App::make(SyncStorageModel::class));
+        parent::__construct(App::make(SyncStoragePullModel::class));
     }
 
     public function getByVersion($version)

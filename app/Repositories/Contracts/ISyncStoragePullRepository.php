@@ -2,7 +2,7 @@
 
 namespace App\Repositories\Contracts;
 
-interface ISyncStorageRepository extends IGenericRepository
+interface ISyncStoragePullRepository extends IGenericRepository
 {
     public function getByVersion($version);
 }

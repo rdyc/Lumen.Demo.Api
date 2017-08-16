@@ -117,10 +117,14 @@ class SyncController extends Controller
 
             $payload = new SyncRequest(Input::all());
 
-            $latest = $this->service->getLatest($payload->parse(), $user);
+            $latest = $this->service->latest($payload, $user);
             //print_r($latest);exit;
 
-            return response()->json($latest);
+            if ($latest) {
+                return response()->json($latest);
+            } else {
+                return response(null, Response::HTTP_NO_CONTENT);
+            }
 
             //return $latest ? $this->buildCollectionResponse($latest, new SyncModelTransformer) : response(null, Response::HTTP_NO_CONTENT);
         } catch (ValidationException $e) {
@@ -168,8 +172,7 @@ class SyncController extends Controller
 
             $payload = new SyncRequest(Input::all());
 
-            //$sync = $this->service->getLatest($payload->parse(), $user);
-            $sync = $this->service->findChanges($payload->version, $user);
+            $sync = $this->service->pull($payload, $user);
             //print_r($sync);exit;
 
             if ($sync) {
@@ -187,7 +190,7 @@ class SyncController extends Controller
     }
 
     /**
-     * @SWG\Post(path="/sync/push",
+     * @SWG\Patch(path="/sync/push",
      *   security={
      *     {"demo_auth": {}}
      *   },
@@ -197,6 +200,15 @@ class SyncController extends Controller
      *   operationId="syncPush",
      *   produces={"application/json"},
      *   @SWG\Parameter(
+     *     in="query",
+     *     name="debug",
+     *     type="string",
+     *     description="Debug payload",
+     *     required=false,
+     *     enum={"true", "false"},
+     *     default="false"
+     *   ),
+     *   @SWG\Parameter(
      *     in="body",
      *     name="payload",
      *     description="Sync data",
@@ -204,7 +216,6 @@ class SyncController extends Controller
      *     @SWG\Schema(ref="#/definitions/SyncPostRequest")
      *   ),
      *   @SWG\Parameter(ref="#/parameters/RequestedWith"),
-     *   @SWG\Response(response=201, ref="#/responses/Created"),
      *   @SWG\Response(response=400, ref="#/responses/BadRequest"),
      *   @SWG\Response(response=401, ref="#/responses/Unauthorized"),
      *   @SWG\Response(response=403, ref="#/responses/Forbidden"),
@@ -214,13 +225,19 @@ class SyncController extends Controller
     public function push()
     {
         try {
-            $post = new SyncPostRequest(Input::all());
+            $debug = filter_var(Input::get('debug', false), FILTER_VALIDATE_BOOLEAN);
 
-            $model = $post->parse();
+            $payload = new SyncPostRequest(Input::all());
 
-            $updated = $this->syncRepository->create($model);
+            if($debug){
+                return response()->json($payload);
+            }
 
-            return response($updated, Response::HTTP_CREATED);
+            $user = (object)Auth::user();
+
+            $push = $this->service->push($payload, $user);
+
+            return response($push, Response::HTTP_ACCEPTED);
         } catch (ValidationException $e) {
             throw new HttpException(Response::HTTP_UNPROCESSABLE_ENTITY, $e->response);
         } catch (HttpException $e) {

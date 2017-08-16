@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateSyncStorageTable extends Migration
+class CreateSyncPushTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,11 +13,13 @@ class CreateSyncStorageTable extends Migration
      */
     public function up()
     {
-        Schema::create('sync_storage', function (Blueprint $table) {
-            $table->increments('sync_storage_id');
-            $table->string('sync_storage_version');
-            $table->string('sync_storage_content');
-            $table->integer('sync_storage_size');
+        Schema::create('sync_push', function (Blueprint $table) {
+            $table->increments('sync_id');
+            $table->string('sync_version');
+            $table->string('sync_client');
+            $table->integer('sync_size');
+            $table->string('sync_path');
+            $table->boolean('sync_is_complete');
             $table->string('created_by');
             $table->string('updated_by');
             $table->timestamps();
@@ -31,6 +33,6 @@ class CreateSyncStorageTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('sync_storage');
+        Schema::dropIfExists('sync_push');
     }
 }

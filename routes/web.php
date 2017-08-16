@@ -30,7 +30,7 @@ $app->group([
         $app->get('/', 'SyncController@get');
         $app->post('/latest', 'SyncController@latest');
         $app->post('/pull', 'SyncController@pull');
-        $app->post('/push', 'SyncController@push');
+        $app->patch('/push', 'SyncController@push');
         $app->post('/track', 'SyncController@track');
     });
 });
