@@ -21,7 +21,7 @@ class MergeService implements IMergeService
     function __construct(IMasterGeneralRepository $generalRepository, ISyncStoragePushRepository $syncStoragePushRepository)
     {
         $this->generalRepository = $generalRepository;
-        $this->$syncStoragePushRepository = $syncStoragePushRepository;
+        $this->syncStoragePushRepository = $syncStoragePushRepository;
 
         $this->populateSyncModels();
     }
