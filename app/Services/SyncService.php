@@ -11,6 +11,7 @@ use App\Repositories\Contracts\ISyncRepository;
 use App\Repositories\Contracts\ISyncStoragePullRepository;
 use App\Repositories\Contracts\ISyncStoragePushRepository;
 use App\Services\Contracts\ISyncService;
+use App\Services\Contracts\Synchronize\IMergeService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Queue;
@@ -27,17 +28,21 @@ class SyncService implements ISyncService
 
     protected $syncStoragePushRepo;
 
+    protected $syncMergeService;
+
     function __construct(ISyncRepository $syncRepository,
                          ISyncPushRepository $syncPushRepository,
                          ISyncClientRepository $syncClientRepository,
                          ISyncStoragePullRepository $syncStoragePullRepository,
-                         ISyncStoragePushRepository $syncStoragePushRepository)
+                         ISyncStoragePushRepository $syncStoragePushRepository,
+                         IMergeService $mergeService)
     {
         $this->syncRepo = $syncRepository;
         $this->syncPushRepo = $syncPushRepository;
         $this->syncClientRepo = $syncClientRepository;
         $this->syncStoragePullRepo = $syncStoragePullRepository;
         $this->syncStoragePushRepo = $syncStoragePushRepository;
+        $this->syncMergeService = $mergeService;
     }
 
     // Public Methods ---------------
@@ -54,21 +59,31 @@ class SyncService implements ISyncService
         return $this->searchLatest($client);
     }
 
+    private function storeLog($attributes, $user)
+    {
+        return $this->syncClientRepo->storeLog($attributes, $user);
+    }
+
+    private function searchLatest($client)
+    {
+        return $this->syncRepo->getLatest($client);
+    }
+
     public function pull($payload, $user)
     {
         $result = null;
 
-        $changes = $this->syncRepo->getSince($payload->version);
+        $syncs = $this->syncRepo->getSince($payload->version);
 
-        if(count($changes) > 0){
+        if (count($syncs) > 0) {
             // visible path
-            $changes = $changes->makeVisible('sync_path')->toArray();
+            $syncs = $syncs->makeVisible('sync_path')->toArray();
 
-            $jsonArray = [];
+            $changes = [];
 
-            foreach ($changes as $item){
+            foreach ($syncs as $item) {
                 // restore from db if local json file was deleted
-                if(!file_exists($item['sync_path'])){
+                if (!file_exists($item['sync_path'])) {
                     $storage = $this->syncStoragePullRepo->getByVersion($item['sync_version']);
 
                     $this->saveIntoFileStorage($item['sync_version'], $storage->sync_storage_content, config('sync.storage.pull.path'));
@@ -77,28 +92,46 @@ class SyncService implements ISyncService
                 // get local file
                 $content = file_get_contents($item['sync_path']);
 
-                if(!$content){
-                    throw new \Exception('Unable to get synchronization data for version '. $item['sync_version']);
+                if (!$content) {
+                    throw new \Exception('Unable to get synchronization data for version ' . $item['sync_version']);
                 }
 
                 // decode into json
                 $json = json_decode($content);
 
                 // push data into array
-                $jsonArray[] = $json->data;
+                $changes[] = $json->data;
             }
 
             //print_r($jsonArray);exit;
 
             $result = [
                 'data' => [
-                    'total' => count($jsonArray),
-                    'changeset' => $jsonArray
+                    'total' => count($changes),
+                    'changes' => $changes
                 ]
             ];
         }
 
         return $result;
+    }
+
+    // Private Methods ----------------
+
+    private function saveIntoFileStorage($version, $content, $storagePath)
+    {
+        $ver = explode('-', $version);
+        $path = storage_path($storagePath . $ver[0] . '/' . $ver[1] . '.json');
+
+        // create dir if not exists
+        if (!file_exists(storage_path($storagePath . $ver[0]))) {
+            mkdir(storage_path($storagePath . $ver[0]), 0700);
+        }
+
+        // store json in "~/storage/sync/pull/yymmdd/xxxx.json"
+        file_put_contents($path, $content);
+
+        return $path;
     }
 
     public function push($payload, $user)
@@ -132,18 +165,95 @@ class SyncService implements ISyncService
             'updated_by' => $user->email,
         ]);
 
-        // insert syn queue jobs
-        $job = (new SyncPushProcessorJob(
-            [
-                'version' => $version,
-                'sync_path' => $path
-            ]))
-            ->onQueue('processing')
-            ->delay(Carbon::now()->addSecond(10));
-
-        dispatch($job);
+        // insert sync queue jobs
+        $this->addToQueue($version, $path);
 
         return $content;
+    }
+
+    /**
+     * @param $payload SyncPostRequest
+     * @return array
+     */
+    private function parseRows($payload, $user)
+    {
+        $entities = [];
+
+        // schemas
+        foreach ($payload->schemas as $schema) {
+            $schemas = [];
+
+            // rows
+            foreach ($schema->rows as $row) {
+                $rows = [];
+
+                // row
+                foreach ($row as $column) {
+
+                    // columns
+                    foreach ($column as $field) {
+
+                        // fields
+                        $rows[$field->column] = $field->value;
+                    }
+                }
+
+                $schemas[] = $rows;
+            }
+
+            $entities[] = [
+                'name' => $schema->name,
+                'total' => count($schemas),
+                'items' => $schemas
+            ];
+        }
+
+        $result = [
+            'user' => $user->email,
+            'client' => $payload->client,
+            'version' => $payload->version,
+            'total' => count($entities),
+            'schemas' => $entities
+        ];
+
+        return $result;
+    }
+
+    private function generateVersion($mode = 'pull')
+    {
+        $carbon = Carbon::now();
+        //print_r(Carbon::parse($carbon));exit;
+
+        $version_count = $mode == 'pull' ? $this->syncRepo->count($carbon) : $this->syncPushRepo->count($carbon);
+        $version_prefix = $carbon->format('ymd');
+        $version_len = (int)(log($version_count, 10) + 1); //print_r($version_len);exit;
+        $version_seq = str_repeat('0', (4 - ($version_len == 0 ? ($version_len + 1) : $version_len))) . ($version_count + 1);
+        $version_new = $version_prefix . '-' . $version_seq;
+
+        return $version_new;
+    }
+
+    private function savePushIntoDbStorage($version, $size, $content, $user)
+    {
+        $this->syncStoragePushRepo->create([
+            'sync_storage_version' => $version,
+            'sync_storage_size' => $size,
+            'sync_storage_content' => $content,
+            'created_by' => $user->email,
+            'updated_by' => $user->email,
+        ]);
+    }
+
+    private function addToQueue($version, $path)
+    {
+        $data = [
+            'version' => $version,
+            'path' => $path
+        ];
+
+        $job = new SyncPushProcessorJob($this->syncMergeService, $data);
+
+        Queue::push($job);
     }
 
     public function track($user)
@@ -177,32 +287,6 @@ class SyncService implements ISyncService
         } else {
             return null;
         }
-    }
-
-    // Private Methods ----------------
-
-    private function searchLatest($client)
-    {
-        return $this->syncRepo->getLatest($client);
-    }
-
-    private function storeLog($attributes, $user)
-    {
-        return $this->syncClientRepo->storeLog($attributes, $user);
-    }
-
-    private function generateVersion($mode = 'pull')
-    {
-        $carbon = Carbon::now();
-        //print_r(Carbon::parse($carbon));exit;
-
-        $version_count = $mode == 'pull' ? $this->syncRepo->count($carbon) : $this->syncPushRepo->count($carbon);
-        $version_prefix = $carbon->format('ymd');
-        $version_len = (int)(log($version_count, 10) + 1); //print_r($version_len);exit;
-        $version_seq = str_repeat('0', (4 - ($version_len == 0 ? ($version_len + 1) : $version_len))) . ($version_count + 1);
-        $version_new = $version_prefix . '-' . $version_seq;
-
-        return $version_new;
     }
 
     private function prepareData($version, $carbon, $user)
@@ -266,88 +350,14 @@ class SyncService implements ISyncService
         }
     }
 
-    private function saveIntoFileStorage($version, $content, $storagePath){
-        $ver = explode('-', $version);
-        $path = storage_path($storagePath . $ver[0] . '/' . $ver[1] . '.json');
-
-        // create dir if not exists
-        if (!file_exists(storage_path($storagePath . $ver[0]))) {
-            mkdir(storage_path($storagePath . $ver[0]), 0700);
-        }
-
-        // store json in "~/storage/sync/pull/yymmdd/xxxx.json"
-        file_put_contents($path, $content);
-
-        return $path;
-    }
-
     private function savePullIntoDbStorage($version, $size, $content, $user)
     {
         $this->syncStoragePullRepo->create([
-           'sync_storage_version' => $version,
-           'sync_storage_size' => $size,
-           'sync_storage_content' => $content,
-           'created_by' => $user->email,
-           'updated_by' => $user->email,
-        ]);
-    }
-
-    private function savePushIntoDbStorage($version, $size, $content, $user)
-    {
-        $this->syncStoragePushRepo->create([
             'sync_storage_version' => $version,
             'sync_storage_size' => $size,
             'sync_storage_content' => $content,
             'created_by' => $user->email,
             'updated_by' => $user->email,
         ]);
-    }
-
-    /**
-     * @param $payload SyncPostRequest
-     * @return array
-     */
-    private function parseRows($payload, $user)
-    {
-        $entities = [];
-
-        // schemas
-        foreach ($payload->schemas as $schema) {
-            $schemas = [];
-
-            // rows
-            foreach ($schema->rows as $row) {
-                $rows = [];
-
-                // row
-                foreach ($row as $column) {
-
-                    // columns
-                    foreach ($column as $field) {
-
-                        // fields
-                        $rows[$field->column] = $field->value;
-                    }
-                }
-
-                $schemas[] = $rows;
-            }
-
-            $entities[] = [
-                'name' => $schema->name,
-                'total' => count($schemas),
-                'items' => $schemas
-            ];
-        }
-
-        $result = [
-            'user' => $user->email,
-            'client' => $payload->client,
-            'version' => $payload->version,
-            'total' => count($entities),
-            'schemas' => $entities
-        ];
-
-        return $result;
     }
 }

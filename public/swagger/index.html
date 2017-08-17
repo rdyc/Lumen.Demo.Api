@@ -56,7 +56,7 @@
         onComplete: function(swaggerApi, swaggerUi){
           if(typeof initOAuth == "function") {
             initOAuth({
-              clientId: prompt('Please enter Client Id'),
+                clientId: prompt('Client Id (default: 5 -> HerokuApp)', 5),
               //clientSecret: "iUBxifbMp52QAZBQCQ59pE1an88fq8tEr1rNlzcr",
               //realm: "your-realms",
               redirectUri: window.location.origin,

@@ -66,4 +66,23 @@ abstract class GenericRepository implements IGenericRepository
 
         return $data->onDeleted();
     }
+
+    public function syncUpdateOrCreate($id = null, $model)
+    {
+        if ($id) {
+            // remove creator if defined in sync
+            if (array_key_exists('created_by', $model)) unset($model['created_by']);
+
+            $data = $this->model->find($id);
+
+            // update existing
+            $data->update($model);
+        } else {
+            // add creator/updater if defined in sync
+            if (array_key_exists('created_by', $model)) $model['updated_by'] = $model['created_by'];
+
+            // create a new
+            $this->model->create($model);
+        }
+    }
 }

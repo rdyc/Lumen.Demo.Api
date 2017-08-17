@@ -9,4 +9,6 @@ interface IGenericRepository
     public function create($model);
     public function update($id, $model);
     public function delete($id);
+
+    public function syncUpdateOrCreate($id, $model);
 }
