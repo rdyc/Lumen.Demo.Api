@@ -5,6 +5,7 @@ namespace App\Services\Synchronize;
 
 use App\Models\BaseSyncModel;
 use App\Repositories\Contracts\IMasterGeneralRepository;
+use App\Repositories\Contracts\ISyncStoragePushRepository;
 use App\Services\Contracts\Synchronize\IMergeService;
 use Illuminate\Support\Facades\Log;
 
@@ -12,13 +13,15 @@ class MergeService implements IMergeService
 {
 
     protected $generalRepository;
+    protected $syncStoragePushRepository;
 
     protected $mapModels = [];
     protected $mapKeyModels = [];
 
-    function __construct(IMasterGeneralRepository $generalRepository)
+    function __construct(IMasterGeneralRepository $generalRepository, ISyncStoragePushRepository $syncStoragePushRepository)
     {
         $this->generalRepository = $generalRepository;
+        $this->$syncStoragePushRepository = $syncStoragePushRepository;
 
         $this->populateSyncModels();
     }
@@ -62,7 +65,7 @@ class MergeService implements IMergeService
         if (file_exists($path)) {
             $content = json_decode(file_get_contents($path));
         } else {
-
+            $content = $this->syncStoragePushRepository->getByVersion($version);
         }
 
         if (!$content) throw new \Exception('Sync merge service was unable to get push content for version ' . $version);
