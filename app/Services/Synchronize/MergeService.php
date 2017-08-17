@@ -62,11 +62,14 @@ class MergeService implements IMergeService
     {
         $content = null;
 
-        if (file_exists($path)) {
+        /*if (file_exists($path)) {
             $content = json_decode(file_get_contents($path));
         } else {
             $content = $this->syncStoragePushRepository->getByVersion($version);
-        }
+        }*/
+
+        $push = $this->syncStoragePushRepository->getByVersion($version);
+        $content = json_decode($push->sync_storage_content);
 
         if (!$content) throw new \Exception('Sync merge service was unable to get push content for version ' . $version);
 
