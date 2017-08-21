@@ -2,14 +2,14 @@
 
 namespace App\Models;
 
-class SyncModel extends BaseModel
+class SyncPullModel extends BaseModel
 {
     /**
      * The table associated with the model.
      *
      * @var string
      */
-    protected $table = 'sync';
+    protected $table = 'sync_pull';
 
     /**
      * The primary key for the model.

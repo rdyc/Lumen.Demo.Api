@@ -1,18 +1,19 @@
 <?php
 
-namespace App\Repositories;
+namespace App\Repositories\Synchronize;
 
-use App\Models\SyncModel;
-use App\Repositories\Contracts\ISyncRepository;
+use App\Models\SyncPushModel;
+use App\Repositories\Contracts\Synchronize\ISyncPushRepository;
+use App\Repositories\GenericRepository;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\App;
 
-class SyncRepository extends GenericRepository implements ISyncRepository
+class SyncPushRepository extends GenericRepository implements ISyncPushRepository
 {
 
     public function __construct()
     {
-        parent::__construct(App::make(SyncModel::class));
+        parent::__construct(App::make(SyncPushModel::class));
     }
 
 
@@ -39,7 +40,6 @@ class SyncRepository extends GenericRepository implements ISyncRepository
      */
     public function count($date)
     {
-        //$_date = Carbon::parse($date);
         $date = Carbon::parse($date);
 
         return $this->model
@@ -59,7 +59,7 @@ class SyncRepository extends GenericRepository implements ISyncRepository
 
         if($version){
             $version = $this->model->where('sync_version', $version)->firstOrFail();
-            //print_r(Carbon::parse($version->created_at)->toDateTimeString());exit;
+
             $result = $this->model->where('created_at', '>', Carbon::parse($version->created_at)->toDateTimeString())->get();
         }else{
             $result = $this->model->get();

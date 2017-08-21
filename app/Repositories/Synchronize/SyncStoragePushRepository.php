@@ -1,9 +1,10 @@
 <?php
 
-namespace App\Repositories;
+namespace App\Repositories\Synchronize;
 
 use App\Models\SyncStoragePushModel;
-use App\Repositories\Contracts\ISyncStoragePushRepository;
+use App\Repositories\Contracts\Synchronize\ISyncStoragePushRepository;
+use App\Repositories\GenericRepository;
 use Illuminate\Support\Facades\App;
 
 class SyncStoragePushRepository extends GenericRepository implements ISyncStoragePushRepository

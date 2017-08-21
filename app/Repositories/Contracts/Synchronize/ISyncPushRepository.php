@@ -1,8 +1,10 @@
 <?php
 
-namespace App\Repositories\Contracts;
+namespace App\Repositories\Contracts\Synchronize;
 
-interface ISyncRepository extends IGenericRepository
+use App\Repositories\Contracts\IGenericRepository;
+
+interface ISyncPushRepository extends IGenericRepository
 {
     public function getLatest($client = null);
 

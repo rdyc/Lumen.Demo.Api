@@ -3,7 +3,7 @@
 namespace App\Transformers;
 
 use App\Http\Responses\SyncResponse;
-use App\Models\SyncModel;
+use App\Models\SyncPullModel;
 use League\Fractal\TransformerAbstract;
 
 class SyncClientModelTransformer extends TransformerAbstract
@@ -22,7 +22,7 @@ class SyncClientModelTransformer extends TransformerAbstract
      *
      * @return array
      */
-    public function transform(SyncModel $model)
+    public function transform(SyncPullModel $model)
     {
         $response = new SyncResponse($model);
 

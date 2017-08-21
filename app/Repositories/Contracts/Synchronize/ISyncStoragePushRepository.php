@@ -1,6 +1,8 @@
 <?php
 
-namespace App\Repositories\Contracts;
+namespace App\Repositories\Contracts\Synchronize;
+
+use App\Repositories\Contracts\IGenericRepository;
 
 interface ISyncStoragePushRepository extends IGenericRepository
 {

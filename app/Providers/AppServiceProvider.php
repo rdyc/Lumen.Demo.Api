@@ -69,17 +69,17 @@ class AppServiceProvider extends ServiceProvider
 
     private function register_services()
     {
-        $this->app->bind(\App\Services\Contracts\ISyncService::class, \App\Services\SyncService::class, true);
-        $this->app->bind(\App\Services\Contracts\Synchronize\IMergeService::class, \App\Services\Synchronize\MergeService::class, true);
+        $this->app->bind(\App\Services\Contracts\Synchronize\ISyncManagerService::class, \App\Services\Synchronize\SyncManagerService::class, true);
+        $this->app->bind(\App\Services\Contracts\Synchronize\ISyncMergeService::class, \App\Services\Synchronize\SyncMergeService::class, true);
     }
 
     private function register_repositories()
     {
         $this->app->bind(\App\Repositories\Contracts\IMasterGeneralRepository::class, \App\Repositories\MasterGeneralRepository::class, true);
-        $this->app->bind(\App\Repositories\Contracts\ISyncRepository::class, \App\Repositories\SyncRepository::class, true);
-        $this->app->bind(\App\Repositories\Contracts\ISyncPushRepository::class, \App\Repositories\SyncPushRepository::class, true);
-        $this->app->bind(\App\Repositories\Contracts\ISyncClientRepository::class, \App\Repositories\SyncClientRepository::class, true);
-        $this->app->bind(\App\Repositories\Contracts\ISyncStoragePullRepository::class, \App\Repositories\SyncStoragePullRepository::class, true);
-        $this->app->bind(\App\Repositories\Contracts\ISyncStoragePushRepository::class, \App\Repositories\SyncStoragePushRepository::class, true);
+        $this->app->bind(\App\Repositories\Contracts\Synchronize\ISyncPullRepository::class, \App\Repositories\Synchronize\SyncPullRepository::class, true);
+        $this->app->bind(\App\Repositories\Contracts\Synchronize\ISyncPushRepository::class, \App\Repositories\Synchronize\SyncPushRepository::class, true);
+        $this->app->bind(\App\Repositories\Contracts\Synchronize\ISyncClientRepository::class, \App\Repositories\Synchronize\SyncClientRepository::class, true);
+        $this->app->bind(\App\Repositories\Contracts\Synchronize\ISyncStoragePullRepository::class, \App\Repositories\Synchronize\SyncStoragePullRepository::class, true);
+        $this->app->bind(\App\Repositories\Contracts\Synchronize\ISyncStoragePushRepository::class, \App\Repositories\Synchronize\SyncStoragePushRepository::class, true);
     }
 }

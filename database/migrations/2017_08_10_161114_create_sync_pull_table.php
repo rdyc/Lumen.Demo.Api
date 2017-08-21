@@ -1,10 +1,10 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
-class CreateSyncTable extends Migration
+class CreateSyncPullTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,7 +13,7 @@ class CreateSyncTable extends Migration
      */
     public function up()
     {
-        Schema::create('sync', function (Blueprint $table) {
+        Schema::create('sync_pull', function (Blueprint $table) {
             $table->increments('sync_id');
             $table->string('sync_version');
             $table->string('sync_client');
@@ -32,6 +32,6 @@ class CreateSyncTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('sync');
+        Schema::dropIfExists('sync_pull');
     }
 }

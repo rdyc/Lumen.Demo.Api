@@ -2,7 +2,7 @@
 
 namespace App\Jobs;
 
-use App\Services\Contracts\Synchronize\IMergeService;
+use App\Services\Contracts\Synchronize\ISyncMergeService;
 
 class SyncPushProcessorJob extends Job
 {
@@ -31,10 +31,10 @@ class SyncPushProcessorJob extends Job
     /**
      * Create a new job instance.
      *
-     * @param IMergeService $mergeService
+     * @param ISyncMergeService $mergeService
      * @param $data array
      */
-    public function __construct(IMergeService $mergeService, $data)
+    public function __construct(ISyncMergeService $mergeService, $data)
     {
         $this->data = $data;
         $this->service = $mergeService;

@@ -16,7 +16,7 @@ class SyncPullRequest extends Sync
     {
         $this->validator = Validator::make($payload, [
             'client' => 'required|string|max:255',
-            'version' => 'string|max:255|nullable|exists:sync,sync_version'
+            'version' => 'string|max:255|nullable|exists:sync_pull,sync_version'
         ]);
 
         if ($this->validator->fails()) {

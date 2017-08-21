@@ -6,29 +6,28 @@ use Illuminate\Validation\ValidationException;
 use Validator;
 
 /**
- * @SWG\Definition(@SWG\Xml(name="SyncPostRequest"))
+ * @SWG\Definition(@SWG\Xml(name="SyncPatchRequest"))
  */
-class SyncPostRequest extends Sync
+class SyncPatchRequest extends Sync
 {
-    protected $validator;
-
     /**
      * @SWG\Property
      * @var \App\Http\Requests\Schema[]
      */
     public $schemas;
+    protected $validator;
 
     /**
      * SyncPostRequest constructor.
      * @param $payload
      * @throws ValidationException
-     * @return SyncPostRequest
+     * @return SyncPatchRequest
      */
     public function __construct($payload)
     {
         $this->validator = Validator::make($payload, [
             'client' => 'required|string|max:255|exists:sync_client,sync_client_identifier',
-            'version' => 'string|max:255|nullable|exists:sync,sync_version',
+            'version' => 'string|max:255|nullable|exists:sync_pull,sync_version',
             'schemas' => 'required|array',
             'schemas.*.name' => 'required|string',
             'schemas.*.rows' => 'required|array',

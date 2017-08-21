@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\SyncPostRequest;
-use App\Http\Requests\SyncRequest;
-use App\Services\Contracts\ISyncService;
+use App\Http\Requests\SyncPatchRequest;
+use App\Http\Requests\SyncPullRequest;
+use App\Services\Contracts\Synchronize\ISyncManagerService;
 use App\Transformers\SyncModelTransformer;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Input;
@@ -17,11 +17,11 @@ class SyncController extends Controller
 {
 
     /**
-     * @var \App\Services\Contracts\ISyncService
+     * @var \App\Services\Contracts\ISyncManagerService
      */
     protected $service;
 
-    public function __construct(ISyncService $service)
+    public function __construct(ISyncManagerService $service)
     {
         $this->service = $service;
     }
@@ -96,7 +96,7 @@ class SyncController extends Controller
      *     name="payload",
      *     description="Sync data",
      *     required=true,
-     *     @SWG\Schema(ref="#/definitions/SyncRequest")
+     *     @SWG\Schema(ref="#/definitions/SyncPullRequest")
      *   ),
      *   @SWG\Parameter(ref="#/parameters/RequestedWith"),
      *   @SWG\Response(
@@ -115,7 +115,7 @@ class SyncController extends Controller
         try {
             $user = (object)Auth::user();
 
-            $payload = new SyncRequest(Input::all());
+            $payload = new SyncPullRequest(Input::all());
 
             $latest = $this->service->latest($payload, $user);
             //print_r($latest);exit;
@@ -151,7 +151,7 @@ class SyncController extends Controller
      *     name="payload",
      *     description="Sync data",
      *     required=true,
-     *     @SWG\Schema(ref="#/definitions/SyncRequest")
+     *     @SWG\Schema(ref="#/definitions/SyncPullRequest")
      *   ),
      *   @SWG\Parameter(ref="#/parameters/RequestedWith"),
      *   @SWG\Response(
@@ -170,7 +170,7 @@ class SyncController extends Controller
         try {
             $user = (object)Auth::user();
 
-            $payload = new SyncRequest(Input::all());
+            $payload = new SyncPullRequest(Input::all());
 
             $sync = $this->service->pull($payload, $user);
             //print_r($sync);exit;
@@ -213,7 +213,7 @@ class SyncController extends Controller
      *     name="payload",
      *     description="Sync data",
      *     required=true,
-     *     @SWG\Schema(ref="#/definitions/SyncPostRequest")
+     *     @SWG\Schema(ref="#/definitions/SyncPatchRequest")
      *   ),
      *   @SWG\Parameter(ref="#/parameters/RequestedWith"),
      *   @SWG\Response(response=400, ref="#/responses/BadRequest"),
@@ -227,7 +227,7 @@ class SyncController extends Controller
         try {
             $debug = filter_var(Input::get('debug', false), FILTER_VALIDATE_BOOLEAN);
 
-            $payload = new SyncPostRequest(Input::all());
+            $payload = new SyncPatchRequest(Input::all());
 
             if($debug){
                 return response()->json($payload);
