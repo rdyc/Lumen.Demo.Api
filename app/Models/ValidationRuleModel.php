@@ -6,6 +6,13 @@ class ValidationRuleModel extends BaseSyncModel
 {
 
     /**
+     * Repository class name
+     *
+     * @var string
+     */
+    protected $repository = '\App\Repositories\ValidationRuleRepository';
+
+    /**
      * The table associated with the model.
      *
      * @var string

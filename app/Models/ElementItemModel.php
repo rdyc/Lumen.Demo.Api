@@ -4,6 +4,12 @@ namespace App\Models;
 
 class ElementItemModel extends BaseSyncModel
 {
+    /**
+     * Repository class name
+     *
+     * @var string
+     */
+    protected $repository = '\App\Repositories\ElementItemRepository';
 
     /**
      * The table associated with the model.

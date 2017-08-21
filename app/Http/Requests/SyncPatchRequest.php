@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Services\Contracts\Synchronize\ISyncHelperService;
 use Illuminate\Validation\ValidationException;
 use Validator;
 
@@ -15,23 +16,27 @@ class SyncPatchRequest extends Sync
      * @var \App\Http\Requests\Schema[]
      */
     public $schemas;
+
     protected $validator;
 
     /**
      * SyncPostRequest constructor.
+     *
      * @param $payload
+     * @param ISyncHelperService $helperService
      * @throws ValidationException
-     * @return SyncPatchRequest
      */
-    public function __construct($payload)
+    public function __construct($payload, ISyncHelperService $helperService)
     {
+        $classes = $helperService->populateModels(); //print_r($classes);exit;
+
         $this->validator = Validator::make($payload, [
             'client' => 'required|string|max:255|exists:sync_client,sync_client_identifier',
-            'version' => 'string|max:255|nullable|exists:sync_pull,sync_version',
+            'version' => 'required|string|max:255|exists:sync_pull,sync_version',
             'schemas' => 'required|array',
-            'schemas.*.name' => 'required|string',
-            'schemas.*.rows' => 'required|array',
-            'schemas.*.rows.*.row' => 'required|array',
+            'schemas.*.name' => 'required|string|in:'. implode(',', array_keys($classes)),
+            'schemas.*.rows' => 'required_with:schemas.*.name|array',
+            'schemas.*.rows.*.row' => 'required_with:schemas.*.name|array',
             'schemas.*.rows.*.row.*.column' => 'required|string',
             'schemas.*.rows.*.row.*.value' => 'nullable'
         ]);

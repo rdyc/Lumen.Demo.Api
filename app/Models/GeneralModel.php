@@ -2,22 +2,30 @@
 
 namespace App\Models;
 
-class MatrixElementModel extends BaseSyncModel
+class GeneralModel extends BaseSyncModel
 {
+
+    /**
+     * Repository class name
+     *
+     * @var string
+     */
+    protected $repository = '\App\Repositories\GeneralRepository';
+
 
     /**
      * The table associated with the model.
      *
      * @var string
      */
-    protected $table = 'tr_matrix_element';
+    protected $table = 'tm_general_data';
 
     /**
      * The primary key for the model.
      *
      * @var string
      */
-    protected $primaryKey = 'matrix_element_id';
+    protected $primaryKey = 'general_data_id';
 
     /**
      * Indicates if the IDs are auto-incrementing.
@@ -32,8 +40,13 @@ class MatrixElementModel extends BaseSyncModel
      * @var array
      */
     protected $fillable = [
-        'element_id',
-        'kategori',
+        'general_code', 
+        'description_code',
+        'description',
+        'initial_code',
+        'color',
+        'general_id',
+        'sorting',
         'fl_status',
         'created_by',
         'updated_by',
@@ -46,7 +59,8 @@ class MatrixElementModel extends BaseSyncModel
      * @var array
      */
     protected $casts = [
-        'element_id' => 'integer',
+        'general_data_id' => 'integer',
+        'sorting' => 'integer',
         'fl_status' => 'boolean',
     ];
 

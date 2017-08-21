@@ -10,15 +10,17 @@ use App\Repositories\Contracts\Synchronize\ISyncPullRepository;
 use App\Repositories\Contracts\Synchronize\ISyncPushRepository;
 use App\Repositories\Contracts\Synchronize\ISyncStoragePullRepository;
 use App\Repositories\Contracts\Synchronize\ISyncStoragePushRepository;
+use App\Services\Contracts\Synchronize\ISyncHelperService;
 use App\Services\Contracts\Synchronize\ISyncManagerService;
 use App\Services\Contracts\Synchronize\ISyncMergeService;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\App;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Queue;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class SyncManagerService implements ISyncManagerService
 {
-    protected $syncRepo;
+    protected $syncPullRepo;
 
     protected $syncPushRepo;
 
@@ -30,26 +32,35 @@ class SyncManagerService implements ISyncManagerService
 
     protected $syncMergeService;
 
+    protected $syncHelperService;
+
     function __construct(ISyncPullRepository $syncRepository,
                          ISyncPushRepository $syncPushRepository,
                          ISyncClientRepository $syncClientRepository,
                          ISyncStoragePullRepository $syncStoragePullRepository,
                          ISyncStoragePushRepository $syncStoragePushRepository,
-                         ISyncMergeService $mergeService)
+                         ISyncMergeService $mergeService,
+                         ISyncHelperService $helperService)
     {
-        $this->syncRepo = $syncRepository;
+        $this->syncPullRepo = $syncRepository;
         $this->syncPushRepo = $syncPushRepository;
         $this->syncClientRepo = $syncClientRepository;
         $this->syncStoragePullRepo = $syncStoragePullRepository;
         $this->syncStoragePushRepo = $syncStoragePushRepository;
         $this->syncMergeService = $mergeService;
+        $this->syncHelperService = $helperService;
     }
 
     // Public Methods ---------------
 
     public function get($page, $limit, $order, $sort)
     {
-        return $this->syncRepo->get($page, $limit, $order, $sort);
+        return $this->syncPullRepo->get($page, $limit, $order, $sort);
+    }
+
+    public function getSyncedModels()
+    {
+        return json_decode(json_encode($this->syncHelperService->populateModels()));
     }
 
     public function latest($payload, $user)
@@ -59,21 +70,40 @@ class SyncManagerService implements ISyncManagerService
         return $this->searchLatest($client);
     }
 
-    private function storeLog($attributes, $user)
+    public function track($user)
     {
-        return $this->syncClientRepo->storeLog($attributes, $user);
-    }
+        $version = $this->syncPullRepo->getLatest();
 
-    private function searchLatest($client)
-    {
-        return $this->syncRepo->getLatest($client);
+        // assign default date when latest version not exists
+        $now = $version ? $version->updated_at : Carbon::parse('1970-01-01 00:00:00');
+
+        // prepare new version number
+        $version = $this->generateVersion();
+
+        // prepare data changes
+        $path = $this->prepareData($version, $now, $user);
+
+        if ($path) {
+            $sync = [
+                'sync_version' => $version,
+                'sync_client' => $_SERVER['REMOTE_ADDR'],
+                'sync_size' => filesize($path),
+                'sync_path' => $path,
+                'created_by' => $user->email,
+                'updated_by' => $user->email,
+            ];
+
+            return $this->syncPullRepo->store($sync);
+        } else {
+            return null;
+        }
     }
 
     public function pull($payload, $user)
     {
         $result = null;
 
-        $syncs = $this->syncRepo->getSince($payload->version);
+        $syncs = $this->syncPullRepo->getSince($payload->version);
 
         if (count($syncs) > 0) {
             // visible path
@@ -114,26 +144,12 @@ class SyncManagerService implements ISyncManagerService
         return $result;
     }
 
-    // Private Methods ----------------
-
-    private function saveIntoFileStorage($version, $content, $storagePath)
-    {
-        $ver = explode('-', $version);
-        $path = storage_path($storagePath . $ver[0] . '/' . $ver[1] . '.json');
-
-        // create dir if not exists
-        if (!file_exists(storage_path($storagePath . $ver[0]))) {
-            mkdir(storage_path($storagePath . $ver[0]), 0700);
-        }
-
-        // store json in "~/storage/sync/pull/yymmdd/xxxx.json"
-        file_put_contents($path, $content);
-
-        return $path;
-    }
-
     public function push($payload, $user)
     {
+        // check current version is in behind or not?
+        if (count($this->syncPullRepo->getSince($payload->version)) != 1)
+            throw new HttpException(Response::HTTP_BAD_REQUEST, 'Your local version is in behind, try to pull first!');
+
         // flatten schema rows
         $content = $this->parseRows($payload, $user);
 
@@ -164,6 +180,34 @@ class SyncManagerService implements ISyncManagerService
         $this->addToQueue($version, $path);
 
         return $content;
+    }
+
+    // Private Methods ----------------
+
+    private function storeLog($attributes, $user)
+    {
+        return $this->syncClientRepo->storeLog($attributes, $user);
+    }
+
+    private function searchLatest($client)
+    {
+        return $this->syncPullRepo->getLatest($client);
+    }
+
+    private function saveIntoFileStorage($version, $content, $storagePath)
+    {
+        $ver = explode('-', $version);
+        $path = storage_path($storagePath . $ver[0] . '/' . $ver[1] . '.json');
+
+        // create dir if not exists
+        if (!file_exists(storage_path($storagePath . $ver[0]))) {
+            mkdir(storage_path($storagePath . $ver[0]), 0700);
+        }
+
+        // store json in "~/storage/sync/pull/yymmdd/xxxx.json"
+        file_put_contents($path, $content);
+
+        return $path;
     }
 
     /**
@@ -218,7 +262,7 @@ class SyncManagerService implements ISyncManagerService
     {
         $carbon = Carbon::now();
 
-        $version_count = $mode == 'pull' ? $this->syncRepo->count($carbon) : $this->syncPushRepo->count($carbon);
+        $version_count = $mode == 'pull' ? $this->syncPullRepo->count($carbon) : $this->syncPushRepo->count($carbon);
         $version_prefix = $carbon->format('ymd');
         $version_len = (int)(log($version_count, 10) + 1);
         $version_seq = str_repeat('0', (4 - ($version_len == 0 ? ($version_len + 1) : $version_len))) . ($version_count + 1);
@@ -250,47 +294,11 @@ class SyncManagerService implements ISyncManagerService
         Queue::push($job);
     }
 
-    public function track($user)
-    {
-        $version = $this->syncRepo->getLatest();
-
-        // assign default date when latest version not exists
-        $now = $version ? $version->updated_at : Carbon::parse('1970-01-01 00:00:00');
-
-        // prepare new version number
-        $version = $this->generateVersion();
-
-        // prepare data changes
-        $path = $this->prepareData($version, $now, $user);
-
-        if ($path) {
-            $sync = [
-                'sync_version' => $version,
-                'sync_client' => $_SERVER['REMOTE_ADDR'],
-                'sync_size' => filesize($path),
-                'sync_path' => $path,
-                'created_by' => $user->email,
-                'updated_by' => $user->email,
-            ];
-
-            return $this->syncRepo->store($sync);
-        } else {
-            return null;
-        }
-    }
-
     private function prepareData($version, $carbon, $user)
     {
         $carbon = Carbon::parse($carbon);
 
         $schemas = null;
-
-        // load classes
-        App::make(\App\Models\GeneralDataModel::class);
-        App::make(\App\Models\ElementFormModel::class);
-        App::make(\App\Models\ElementItemModel::class);
-        App::make(\App\Models\ValidationRuleModel::class);
-        App::make(\App\Models\MatrixElementModel::class);
 
         // get all sync classes
         foreach (get_declared_classes() as $class) {

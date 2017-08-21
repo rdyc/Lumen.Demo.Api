@@ -4,6 +4,12 @@ namespace App\Models;
 
 class ElementFormModel extends BaseSyncModel
 {
+    /**
+     * Repository class name
+     *
+     * @var string
+     */
+    protected $repository = '\App\Repositories\ElementFormRepository';
 
     /**
      * The table associated with the model.

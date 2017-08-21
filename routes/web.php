@@ -28,6 +28,7 @@ $app->group([
 
     $app->group(['prefix' => 'sync'], function () use ($app) {
         $app->get('/', 'SyncController@get');
+        $app->get('/models', 'SyncController@models');
         $app->post('/latest', 'SyncController@latest');
         $app->post('/pull', 'SyncController@pull');
         $app->patch('/push', 'SyncController@push');

@@ -2,55 +2,36 @@
 
 namespace App\Services\Synchronize;
 
-use App\Models\BaseSyncModel;
-use App\Repositories\Contracts\IMasterGeneralRepository;
 use App\Repositories\Contracts\Synchronize\ISyncStoragePushRepository;
+use App\Services\Contracts\Synchronize\ISyncHelperService;
 use App\Services\Contracts\Synchronize\ISyncMergeService;
 use Illuminate\Support\Facades\Log;
 
 class SyncMergeService implements ISyncMergeService
 {
-
-    protected $generalRepository;
     protected $syncStoragePushRepository;
+    protected $syncHelperService;
 
     protected $mapModels = [];
     protected $mapKeyModels = [];
 
-    function __construct(IMasterGeneralRepository $generalRepository, ISyncStoragePushRepository $syncStoragePushRepository)
+    function __construct(ISyncStoragePushRepository $syncStoragePushRepository,
+                         ISyncHelperService $syncHelperService)
     {
-        $this->generalRepository = $generalRepository;
         $this->syncStoragePushRepository = $syncStoragePushRepository;
+        $this->syncHelperService = $syncHelperService;
 
-        $this->populateSyncModels();
-    }
-
-    private function populateSyncModels()
-    {
-        // get all sync classes
-        foreach (get_declared_classes() as $class) {
-            if (is_subclass_of($class, BaseSyncModel::class)) {
-                $model = new $class;
-
-                $table = $model->getTable();
-
-                if (!array_key_exists($class, $this->mapModels))
-                    $this->mapModels[$table] = $class;
-
-                if (!array_key_exists($table, $this->mapKeyModels))
-                    $this->mapKeyModels[$table] = $model->getKeyName();
-            }
-        }
+        $this->mapModels = $this->syncHelperService->populateModels();
     }
 
     public function start($version, $path)
     {
-        if (empty($this->mapModels)) throw new \Exception('Sync merge service was unable to find sync models');
+        if (empty($this->mapModels)) throw new \Exception('Sync merge service was unable to find synced models');
         if (!$version) throw new \Exception('Sync merge service was unable to find current version');
         if (!$path) throw new \Exception('Sync merge service was unable to find current path');
 
-        Log::info('[Queue] Mapped sync models: ' . implode(',', $this->mapModels));
-        Log::info('[Queue] Mapped sync keys: ' . implode(',', $this->mapKeyModels));
+        Log::info('[Queue] Mapped synced models: ' . implode(',', array_keys($this->mapModels)));
+        //Log::info('[Queue] Mapped sync keys: ' . implode(',', $this->mapKeyModels));
 
         $content = $this->getContent($version, $path);
 
@@ -71,6 +52,8 @@ class SyncMergeService implements ISyncMergeService
 
     private function execute($content)
     {
+        $user = $content->user;
+
         // schemas
         foreach ($content->schemas as $key => $schema) {
             $table = $schema->name;
@@ -78,7 +61,7 @@ class SyncMergeService implements ISyncMergeService
             // check schema name exists
             if (array_key_exists($table, $this->mapModels)) {
                 // get key name for current schema
-                $primaryKey = $this->mapKeyModels[$table];
+                $primaryKey = $this->mapModels[$table]['key'];
 
                 // processing item
                 foreach ($schema->items as $key => $value) {
@@ -86,8 +69,16 @@ class SyncMergeService implements ISyncMergeService
                     if (array_key_exists($primaryKey, $value)) {
                         Log::info('[Queue] Processing "' . $table . '" at index ' . $key . ' w/ data: ' . json_encode($value));
 
+                        // merge values
+                        $attributes = array_merge((array)$value, ['updated_by' => $user]);
+
                         // do update or create
-                        $this->updateOrCreate($table, $value->{$primaryKey}, (array)$value);
+                        if(class_exists($this->mapModels[$table]['repository'], true)){
+                            $repo = new $this->mapModels[$table]['repository'];
+                            $repo->syncUpdateOrCreate($value->{$primaryKey}, $attributes);
+                        }else{
+                            Log::warning('[Queue] Unable to load class '. $this->mapModels[$table]['repository']);
+                        }
                     } else {
                         Log::warning('[Queue] Schema primary key "' . $table . '.' . $primaryKey . '" was not found in push items at index ' . $key);
                     }
@@ -95,15 +86,6 @@ class SyncMergeService implements ISyncMergeService
             } else {
                 Log::warning('[Queue] Schema name "' . $table . '" was not in sync models');
             }
-        }
-    }
-
-    private function updateOrCreate($table, $id, $value)
-    {
-        switch ($table) {
-            case 'tm_general_data';
-                $this->generalRepository->syncUpdateOrCreate($id, $value);
-                break;
         }
     }
 }

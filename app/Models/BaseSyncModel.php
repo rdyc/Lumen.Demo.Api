@@ -7,6 +7,10 @@ use Carbon\Carbon;
 abstract class BaseSyncModel extends BaseModel
 {
 
+    public function getRepository(){
+        return $this->repository;
+    }
+
     /**
      * @param $carbon \Carbon\Carbon
      * @return mixed

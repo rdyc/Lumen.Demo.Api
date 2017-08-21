@@ -13,4 +13,6 @@ interface ISyncManagerService
     public function push($payload, $user);
 
     public function track($user);
+
+    public function getSyncedModels();
 }

@@ -5,8 +5,10 @@ namespace App\Http\Controllers\V1;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\SyncPatchRequest;
 use App\Http\Requests\SyncPullRequest;
+use App\Services\Contracts\Synchronize\ISyncHelperService;
 use App\Services\Contracts\Synchronize\ISyncManagerService;
 use App\Transformers\SyncModelTransformer;
+use App\Transformers\SyncPullTransformer;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Validation\ValidationException;
@@ -17,13 +19,19 @@ class SyncController extends Controller
 {
 
     /**
-     * @var \App\Services\Contracts\ISyncManagerService
+     * @var ISyncManagerService
      */
     protected $service;
 
-    public function __construct(ISyncManagerService $service)
+    /**
+     * @var ISyncHelperService
+     */
+    protected $helper;
+
+    public function __construct(ISyncManagerService $service, ISyncHelperService $helperService)
     {
         $this->service = $service;
+        $this->helper = $helperService;
     }
 
     /**
@@ -70,7 +78,45 @@ class SyncController extends Controller
             $items = $this->service->get($page, $limit, $order, $sort);
 
             if ($items) {
-                return $this->buildCollectionResponse($items, new SyncModelTransformer);
+                return $this->buildCollectionResponse($items, new SyncPullTransformer);
+            } else {
+                return response(null, Response::HTTP_NO_CONTENT);
+            }
+        } catch (HttpException $e) {
+            throw new HttpException($e->getStatusCode(), $e->getMessage());
+        } catch (\Exception $e) {
+            throw new HttpException(Response::HTTP_INTERNAL_SERVER_ERROR, $e->getMessage());
+        }
+    }
+
+    /**
+     * @SWG\Get(path="/sync/models",
+     *   security={
+     *     {"demo_auth": {}}
+     *   },
+     *   tags={"Sync"},
+     *   summary="Get synced models",
+     *   description="",
+     *   operationId="getSynced",
+     *   produces={"application/json"},
+     *   @SWG\Response(
+     *     response=200,
+     *     description="Successful operation",
+     *     @SWG\Schema(ref="#/definitions/SyncModelResponse")
+     *   ),
+     *   @SWG\Response(response=400, ref="#/responses/BadRequest"),
+     *   @SWG\Response(response=401, ref="#/responses/Unauthorized"),
+     *   @SWG\Response(response=403, ref="#/responses/Forbidden"),
+     *   @SWG\Response(response=500, ref="#/responses/GeneralError")
+     * )
+     **/
+    public function models()
+    {
+        try {
+            $models = $this->service->getSyncedModels();
+
+            if ($models) {
+                return $this->buildItemResponse($models, new SyncModelTransformer());
             } else {
                 return response(null, Response::HTTP_NO_CONTENT);
             }
@@ -227,9 +273,9 @@ class SyncController extends Controller
         try {
             $debug = filter_var(Input::get('debug', false), FILTER_VALIDATE_BOOLEAN);
 
-            $payload = new SyncPatchRequest(Input::all());
+            $payload = new SyncPatchRequest(Input::all(), $this->helper);
 
-            if($debug){
+            if ($debug) {
                 return response()->json($payload);
             }
 

@@ -2,10 +2,11 @@
 
 namespace App\Transformers;
 
-use App\Http\Responses\SyncModelResponse;
+use App\Http\Responses\SyncResponse;
+use App\Models\SyncPullModel;
 use League\Fractal\TransformerAbstract;
 
-class SyncModelTransformer extends TransformerAbstract
+class SyncPullTransformer extends TransformerAbstract
 {
     /**
      * List of resources possible to include
@@ -21,9 +22,9 @@ class SyncModelTransformer extends TransformerAbstract
      *
      * @return array
      */
-    public function transform($model)
+    public function transform(SyncPullModel $model)
     {
-        $response = new SyncModelResponse($model);
+        $response = new SyncResponse($model);
 
         return $response->serialize();
     }
