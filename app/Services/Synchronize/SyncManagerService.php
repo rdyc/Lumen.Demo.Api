@@ -147,7 +147,7 @@ class SyncManagerService implements ISyncManagerService
     public function push($payload, $user)
     {
         // check current version is in behind or not?
-        if (count($this->syncPullRepo->getSince($payload->version)) != 1)
+        if (count($this->syncPullRepo->getSince($payload->version)) > 1)
             throw new HttpException(Response::HTTP_BAD_REQUEST, 'Your local version is in behind, try to pull first!');
 
         // flatten schema rows
