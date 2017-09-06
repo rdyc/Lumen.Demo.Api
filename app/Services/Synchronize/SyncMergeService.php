@@ -70,7 +70,7 @@ class SyncMergeService implements ISyncMergeService
                         Log::info('[Queue] Processing "' . $table . '" at index ' . $key . ' w/ data: ' . json_encode($value));
 
                         // merge values
-                        $attributes = array_merge((array)$value, ['updated_by' => $user]);
+                        $attributes = array_merge((array)$value, ['created_by' => $user, 'updated_by' => $user]);
 
                         // do update or create
                         if(class_exists($this->mapModels[$table]['repository'], true)){

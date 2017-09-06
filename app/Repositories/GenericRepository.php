@@ -79,7 +79,7 @@ abstract class GenericRepository implements IGenericRepository
             $data->update($model);
         } else {
             // add creator/updater if defined in sync
-            if (array_key_exists('created_by', $model)) $model['updated_by'] = $model['created_by'];
+            //if (array_key_exists('created_by', $model)) $model['updated_by'] = $model['created_by'];
 
             // create a new
             $this->model->create($model);
