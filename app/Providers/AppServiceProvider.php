@@ -83,6 +83,9 @@ class AppServiceProvider extends ServiceProvider
         $this->app->make(\App\Models\ElementItemModel::class);
         $this->app->make(\App\Models\ElementMatrixModel::class);
         $this->app->make(\App\Models\ValidationRuleModel::class);
+        $this->app->make(\App\Models\PemasokHeaderModel::class);
+        $this->app->make(\App\Models\PemasokDetailModel::class);
+        $this->app->make(\App\Models\PemasokDetailItemModel::class);
     }
 
     private function register_services()
@@ -99,6 +102,9 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(\App\Repositories\Contracts\IElementItemRepository::class, \App\Repositories\ElementItemRepository::class, true);
         $this->app->bind(\App\Repositories\Contracts\IElementMatrixRepository::class, \App\Repositories\ElementMatrixRepository::class, true);
         $this->app->bind(\App\Repositories\Contracts\IValidationRuleRepository::class, \App\Repositories\ValidationRuleRepository::class, true);
+        $this->app->bind(\App\Repositories\Contracts\IPemasokHeaderRepository::class, \App\Repositories\PemasokHeaderRepository::class, true);
+        $this->app->bind(\App\Repositories\Contracts\IPemasokDetailRepository::class, \App\Repositories\PemasokDetailRepository::class, true);
+        $this->app->bind(\App\Repositories\Contracts\IPemasokDetailItemRepository::class, \App\Repositories\PemasokDetailItemRepository::class, true);
 
         $this->app->bind(\App\Repositories\Contracts\Synchronize\ISyncPullRepository::class, \App\Repositories\Synchronize\SyncPullRepository::class, true);
         $this->app->bind(\App\Repositories\Contracts\Synchronize\ISyncPushRepository::class, \App\Repositories\Synchronize\SyncPushRepository::class, true);
